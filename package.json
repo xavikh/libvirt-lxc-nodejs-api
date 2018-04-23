@@ -1,0 +1,45 @@
+{
+  "name": "cdws",
+  "version": "0.0.0",
+  "private": true,
+  "description": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CoreDumped-ETSISI/CDWS.git"
+  },
+  "main": "lib/index.js",
+  "scripts": {
+    "start": "node ./bin/www"
+  },
+  "dependencies": {
+    "@sendgrid/mail": "^6.2.1",
+    "bcrypt-nodejs": "^0.0.3",
+    "bindings": "^1.2.1",
+    "bluebird": "^3.1.1",
+    "body-parser": "~1.18.2",
+    "cookie-parser": "~1.4.3",
+    "debug": "~2.6.9",
+    "express": "~4.15.5",
+    "jade": "~1.11.0",
+    "jwt-simple": "^0.5.1",
+    "moment": "^2.21.0",
+    "mongoose": "^4.13.12",
+    "morgan": "~1.9.0",
+    "nan": "^2.4.0",
+    "node-sass": "^4.8.2",
+    "node-sass-middleware": "^0.11.0",
+    "node-telegram-bot-api": "^0.30.0",
+    "serve-favicon": "~2.4.5"
+  },
+  "devDependencies": {
+    "chai": "^3.4.1",
+    "conventional-changelog-cli": "^1.2.0",
+    "jshint": "^2.9.1-rc1",
+    "mocha": "^2.3.4",
+    "segfault-handler": "^1.0.0",
+    "semver": "^5.1.0",
+    "xpath": "^0.0.9",
+    "xmldom": "^0.1.19"
+  }
+}

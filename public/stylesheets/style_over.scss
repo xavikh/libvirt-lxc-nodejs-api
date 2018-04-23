@@ -1,0 +1,68 @@
+
+$white_color: #f0f0f0;
+$gray_color: #303030;
+$green_accent_color: #53ca1e;
+
+header, main, footer {
+  padding-left: 300px;
+  @media only screen and (max-width : 992px) {
+    padding-left: 0;
+  }
+}
+
+nav {
+  background-color: $gray_color;
+}
+
+.logo_name {
+  margin-right: 15px;
+}
+
+.sidenav {
+  background-color: $gray_color;
+}
+
+.sidenav li > a, .sidenav .subheader, .sidenav li > a > i.material-icons {
+  color: $white_color;
+}
+
+.sidenav .user-view {
+  margin-bottom: -2px;
+}
+
+.breadcrumb:first-child {
+  margin-left: 20px;
+}
+
+.table-container {
+  padding: 20px;
+}
+
+.name {
+  font-weight: bold;
+}
+
+.ram::after {
+  content: " GB";
+}
+
+.action {
+  width: 300px;
+}
+
+.action a{
+  margin-right: 3px;
+}
+
+.status {
+  width: 200px;
+}
+
+.status a{
+  color: #f0f0f0;
+  font-weight: bold;
+}
+
+.non-clickable {
+  cursor: default;
+}

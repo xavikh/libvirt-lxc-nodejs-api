@@ -1,0 +1,83 @@
+extends layout
+
+mixin vm(name, vcpu, ram, status)
+    td.name #{name}
+    td #{vcpu}
+    td.ram #{ram}
+    td.status
+        case status
+            when "Running"
+                a.btn-flat.green.non-clickable #{status}
+            when "Stopped"
+                a.btn-flat.red.non-clickable #{status}
+            default
+                a.btn-flat.orange.non-clickable #{status}
+
+    td.action
+        a.waves-effect.waves-light.btn-small.light-blue
+            i.material-icons play_arrow
+        a.waves-effect.waves-light.btn-small.amber
+            i.material-icons replay
+        a.waves-effect.waves-light.btn-small.orange
+            i.material-icons stop
+        a.waves-effect.waves-light.btn-small.red
+            i.material-icons power
+        a.waves-effect.waves-light.btn-small.grey.darken-4
+            i.material-icons delete
+
+block content
+
+    #modal1.modal
+        .modal-content
+            form.col.s12
+                h4 Create a new Virtual Machine
+                .row
+                    .col.s12
+                        .input-field
+                            input#vmname.validate(type="text")
+                            label(for="vmname") Name
+                        #slider-step-cpu
+                        p#slider-step-cpu-value
+
+                        #slider-step-ram
+                        p#slider-step-ram-value
+
+                        #slider-step-st
+                        p#slider-step-st-value
+        .modal-footer
+            a.modal-action.modal-close.waves-effect.waves-green.btn-flat(href="#!") Create
+            a.modal-action.modal-close.waves-effect.waves-red.btn-flat(href="#!") Cancel
+
+
+
+    include header-nav
+
+    main
+        .fixed-action-btn
+            a.btn-floating.btn-large.red.modal-trigger(href="#modal1")
+                i.large.material-icons add
+            ul
+                li: a.btn-floating.yellow.darken-1.modal-trigger(href="#modal1"): i.material-icons content_copy
+
+
+        include sidebar
+
+        -var emptyList = false
+        .table-container
+            table.centered.highlight
+                thead
+                    tr
+                        th Name
+                        th vCpu
+                        th Ram
+                        th Status
+                        th Action
+                tbody
+                    if !data.domains || data.domains.length < 1
+                        -emptyList = true
+                    else
+                        for vm in data.domains
+                            tr: +vm(vm.name, vm.vcpu, vm.ram, vm.status)
+
+        if emptyList
+            p.center Empty list

@@ -1,0 +1,6 @@
+build
+.DS_Store
+*.sublime-*
+node_modules
+/.idea/
+config.js
