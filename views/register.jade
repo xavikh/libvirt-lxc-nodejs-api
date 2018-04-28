@@ -6,18 +6,23 @@ block content
             .col.s12.m8.offset-m2.l4.offset-l4
                 form#loginForm.card.grey.darken-3.hoverable
                     .card-content.white-text
-                        span.card-title.center CDWS
+                        span.card-title.center Register
                         .section
+                            .input-field
+                                input#name.validate.white-text(type="text" required)
+                                label(for="name") Name
                             .input-field
                                 input#email.validate.white-text(type="email" required)
                                 label(for="email") Email
                             .input-field.white-text
                                 input#pass.validate.white-text(type="password" pattern=".{8}.*" required title="At least 8 characters")
                                 label(for="pass") Password
-                        a(href="#" style="margin: 0 15px") Forgot your password?
+                            .input-field.white-text
+                                input#pass2.validate.white-text(type="password" pattern=".{8}.*" required title="At least 8 characters")
+                                label(for="pass2") Repeat password
+
                     .card-action.login_actions
-                        a.btn.signup_btn.amber.darken-3(href="/signup") Sign up
-                        a.btn.login_btn(onclick="login()") Login
+                        a.btn.login_btn(onclick="signup()") Create user
 
     include main_scripts
     script(src="javascripts/api_calls/token_manager.js")

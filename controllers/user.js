@@ -34,7 +34,10 @@ function signUp(req, res) {
     User.findOne({email: email})
         .exec((err, userExist) => {
             if (err) return res.sendStatus(500);
-            if (userExist) return res.status(409).send({status: 409, message: "Already exist a user with that email"});
+            if (userExist) return res.status(409).send({
+                status: 409,
+                message: "Already exist a user with that email"
+            });
 
             crypto.randomBytes(20, (err, token) => {
                 if (err) return res.sendStatus(500);
@@ -53,7 +56,10 @@ function signUp(req, res) {
                     if (!user) return res.sendStatus(500);
                     if (config.SEND_VERIFICATION_EMAIL)
                         mail.sendWelcomeEmail(user.email, user.displayName, user.verifyEmailToken);
-                    return res.status(201).send({status: 201, message: "User created"});
+                    return res.status(201).send({
+                        status: 201,
+                        message: "User created"
+                    });
                 });
             });
         })
@@ -65,11 +71,11 @@ function login(req, res) {
 
     if (!input.validEmail(email)) return res.status(400).send({
         status: 400,
-        message: "The 'email' field isn't correct or is missing"
+        message: "The 'email' isn't correct"
     });
     if (!input.validPassword(password)) return res.status(400).send({
         status: 400,
-        message: "The 'password' field isn't correct or is missing"
+        message: "The 'password' isn't correct"
     });
 
     User.findOne({email: email})

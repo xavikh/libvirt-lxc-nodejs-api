@@ -2,6 +2,8 @@ const libvirt = require('../lib');
 const HP = libvirt.Hypervisor;
 const modelToXML = require('../services/libvirt_helpers').modelToXML;
 const parseError = require('../errorsLibvirt').parseError;
+const Promise = require("bluebird");
+const xmlParser = require('xml-js');
 
 let hp = new HP('qemu:///system');
 
@@ -41,11 +43,57 @@ function getDomainList(next) {
     connect((err) => {
         if (err) return next(err);
 
-        hp.listDefinedDomains((err, domains) => {
-            if (err) return next(parseError(err));
-            next(null, domains);
+        Promise.join(
+            hp.listDefinedDomainsAsync(),
+            hp.listActiveDomainsAsync(),
+            (defined, active) => {
+                let promises = active.map((id) => {
+                    return new Promise((resolve, reject) => {
+                        hp.lookupDomainById(id, (err, domain) => {
+                            domain.getName((err, name) => {
+                                if (err) reject(err);
+                                resolve(name);
+                            })
+                        })
+                    })
+                });
+
+                Promise.all(promises).then((names) => {
+                    next(null, names.concat(defined));
+                }).catch((err) => {
+                    next(err);
+                })
+
+            });
+    })
+}
+
+function getDomainInfoList(next) {
+    getDomainList((err, domains) => {
+        if (err) return next(err);
+        let promises = domains.map((vm_name) => {
+            let vm = {
+                name: vm_name
+            };
+            return new Promise((resolve, reject) => {
+                getDomainInfo(vm, (err, info) => {
+                    if (err) reject(err);
+                    info.name = vm.name;
+                    getVolumeByName(info.name, (err, vol) => {
+                        getVolInfo(vol, (err, vol_info) => {
+                            info.volume = vol_info;
+                            resolve(info);
+                        })
+                    });
+                })
+            })
+        });
+        Promise.all(promises).then((infos) => {
+            next(null, infos);
+        }).catch((err) => {
+            next(err);
         })
-    });
+    })
 }
 
 function removeDomain(vm, next) {
@@ -58,16 +106,80 @@ function removeDomain(vm, next) {
     });
 }
 
-function getDomainStatus(vm, next) {
+function getDomainInfo(vm, next) {
     getDomainByName(vm.name, (err, domain) => {
         if (err) return next(err);
         domain.getInfo((err, info) => {
             if (err) return next(setError(err));
-            next(null, info.state);
+            next(null, info);
         })
     });
 
 }
+
+
+function editDomain(vm, edit, next) {
+    getDomainByName(vm.name, (err, vm) => {
+        if (err) return next(err);
+        vm.toXml((err, xml) => {
+            if (err) return next(err);
+
+            switch (edit.type) {
+                case "AddCdrom":
+                    if (xml.search("<boot dev='cdrom'/>") !== -1) return next(setError(409, "The domain already have a Cdrom"));
+                    if (xml.search("<disk type='block' device='cdrom'>") !== -1) return next(setError(409, "The domain already have a Cdrom"));
+                    let cdrom = {
+                        name: edit.iso
+                    };
+                    modelToXML(cdrom, 'device_base.xml', (err, cdxml) => {
+
+                        xml = xml.replace("<type arch='x86_64' machine='pc-i440fx-rhel7.0.0'>hvm<\/type>", "$&\n<boot dev='cdrom'/>");
+                        xml = xml.replace("</disk>", "$&\n" + cdxml);
+                        hp.defineDomain(xml, (err, domain) => {
+                            if (err) return next(parseError(err));
+                            next(null, domain !== undefined);
+                        });
+                    });
+                    break;
+                case "AddDisk":
+                    if (xml.search("<source dev='" + edit.hddname + "'/>") !== -1) return next(setError(409, "The domain already have that disk"));
+                    let numDisk = (xml.match(/<disk type='block' device='disk'>/g) || []).length;
+                    let letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g'];
+                    let disk = {
+                        storagePath: edit.storagePath,
+                        letter: letters[numDisk]
+                    };
+                    modelToXML(disk, 'disk_base.xml', (err, diskxml) => {
+
+                        xml = xml.replace("</disk>", "$&\n" + diskxml);
+                        console.log(xml);
+                        // hp.defineDomain(xml, (err, domain) => {
+                        //     if (err) return next(parseError(err));
+                        //     next(null, domain !== undefined);
+                        // });
+                    });
+                    break;
+                case "DeleteCdrom":
+                    xml = xml.replace(/<disk type='file' device='cdrom'>\n([^\/]*|\/>\n(\s)*|(\s)*)*\/disk>/, "");
+                    console.log(xml);
+                    // hp.defineDomain(xml, (err, domain) => {
+                    //     if (err) return next(parseError(err));
+                    //     next(null, domain !== undefined);
+                    // });
+
+                    break;
+                default:
+                    return next(setError(500, "Error"));
+            }
+
+            // hp.defineDomain(xml, (err, domain) => {
+            //     if (err) return next(parseError(err));
+            //     next(null, domain !== undefined);
+            // })
+        })
+    });
+}
+
 
 function cloneDomain(vm, vm_clone, next) {
 
@@ -82,6 +194,33 @@ function attachDevice(vm, device, next) {
 
             let flags = [libvirt.VIR_DOMAIN_DEVICE_MODIFY_CONFIG];
             vm.updateDevice(xml, flags, (err, result) => {
+                if (err) return next(setError(err));
+                return next(null, result);
+            });
+        })
+    });
+}
+
+// function attachIso(vm, device, next) {
+//     getDomainByName(vm.name, (err, vm) => {
+//         if (err) return next(err);
+//
+//         modelToXML(device, 'device_base.xml', (err, xml) => {
+//             if (err) return next(setError(500, "A error occurred parsing the VM to XML"));
+//
+//
+//         })
+//     });
+// }
+
+function attachDeviceTest(vm, device, next) {
+    getDomainByName(vm.name, (err, vm) => {
+        if (err) return next(err);
+
+        modelToXML(device, 'device_base.xml', (err, xml) => {
+            if (err) return next(setError(500, "A error occurred parsing the VM to XML"));
+
+            vm.attachDevice(xml, (err, result) => {
                 if (err) return next(setError(err));
                 return next(null, result);
             });
@@ -140,7 +279,7 @@ function getVolumeList(next) {
     });
 }
 
-function getInfo(volume, next) {
+function getVolInfo(volume, next) {
     volume.getInfo((err, info) => {
         if (err) return next(parseError(err));
         next(null, info);
@@ -187,16 +326,19 @@ module.exports = {
     connect,
 
     defineDomain,
+    editDomain,
     getDomainByName,
     getDomainList,
     removeDomain,
     attachDevice,
-    getDomainStatus,
+    attachDeviceTest,
+    getDomainInfo,
+    getDomainInfoList,
 
     createVolume,
     getVolumeByName,
     getVolumeList,
-    getInfo,
+    getVolInfo,
     removeVolume,
     cloneVolume
 };

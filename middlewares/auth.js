@@ -8,7 +8,8 @@ const User = require('../models/user');
 function isAuth(req, res, next) {
     const auth = req.headers.authorization;
     if (!auth) {
-        return res.sendStatus(401);
+        // return res.sendStatus(401);
+        return res.redirect('login');
     }
 
     const tokenReq = auth.split(" ")[1];

@@ -1,6 +1,6 @@
-<disk type='block' device='cdrom'>
+<disk type='file' device='cdrom'>
     <driver name='qemu' type='raw'/>
     <source file='/isos/{{name}}'/>
-    <target dev='hdc' bus='ide'/>
+    <target dev='hdc'/>
     <readonly/>
 </disk>

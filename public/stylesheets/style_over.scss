@@ -3,6 +3,8 @@ $white_color: #f0f0f0;
 $gray_color: #303030;
 $green_accent_color: #53ca1e;
 
+html,body { height: 100%; margin: 0; padding: 0; }
+
 header, main, footer {
   padding-left: 300px;
   @media only screen and (max-width : 992px) {
@@ -46,6 +48,10 @@ nav {
   content: " GB";
 }
 
+.storage::after {
+  content: " MB";
+}
+
 .action {
   width: 300px;
 }
@@ -65,4 +71,40 @@ nav {
 
 .non-clickable {
   cursor: default;
+}
+
+.v-align {
+  padding-top: 20vh;
+}
+
+.login_bg {
+  height: 100%;
+  background-color: $gray_color;
+  overflow: auto;
+}
+
+.card .card-title{
+  font-size: 2.8em;
+}
+
+.login_actions {
+  height: 60px;
+}
+
+.card > .login_actions > .signup_btn {
+  position: absolute;
+  bottom: 12px;
+  left: 20px;
+  margin-right: 0;
+}
+
+.card > .login_actions > .login_btn {
+  position: absolute;
+  bottom: 12px;
+  right: 20px;
+  margin-right: 0;
+}
+
+.modal > .modal-footer > .modalBtn {
+  margin-right: 15px;
 }

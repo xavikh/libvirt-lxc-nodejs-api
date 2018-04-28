@@ -58,7 +58,7 @@ function removeVolume(req, res) {
 
     lvirt.removeVolume(vol, (err, success) => {
         if(err) return setErrorRes(res, err);
-        return res.status(200).send(success);
+        return res.status(200).send({message: success});
     })
 }
 

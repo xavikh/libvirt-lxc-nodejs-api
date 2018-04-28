@@ -1,0 +1,21 @@
+extends layout
+
+block content
+    .login_bg(onload="request_code()")
+        .row.v-align
+            .col.s12.m8.offset-m2.l4.offset-l4
+                form#loginForm.card.grey.darken-3.hoverable(onSubmit="")
+                    .card-content.white-text
+                        span.card-title.center Insert your code here
+                        .section
+                            .input-field.white-text
+                                input#code.validate.white-text(type="text" pattern="[0-9]{6}" required title="At least 6 numbers")
+                                label(for="code") Your code here
+                    .card-action.login_actions
+                        a.btn.signup_btn.amber.darken-3(href="#" onclick="request_code()") Re-send code
+                        a.btn.login_btn(onclick="send_code()") Confirm
+
+    include main_scripts
+    script(src="javascripts/api_calls/token_manager.js")
+    script(src="javascripts/api_calls/req_config.js")
+    script(src="javascripts/api_calls/api_req.js")
