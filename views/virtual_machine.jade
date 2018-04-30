@@ -1,0 +1,92 @@
+extends layout
+
+mixin vol(name, allocation, capacity)
+    -progress = (allocation / capacity)*100
+    td #{name}
+    td.hide-on-small-only: .progress: .determinate(style="width: "+ progress +"%")
+    td.storage #{allocation} / #{capacity}
+    td
+        a.waves-effect.waves-light.btn-small.red(onclick="open_detach_vol_modal('" + name + "')")
+            i.material-icons eject
+        a.waves-effect.waves-light.btn-small.vol-del-btn.grey.darken-4(onclick="open_delete_vol_modal('" + name + "')")
+            i.material-icons delete
+
+
+block content
+    include header-nav
+    include sidebar
+
+    ul#dropdown1.dropdown-content.isos-dropdown
+        li: a(href="#!") Debian
+            span.badge 8.0
+        li: a(href="#!") Debian
+            span.badge 9.0
+        li.divider(tabindex="-1")
+        li: a(href="#!") Windows
+            span.badge 7
+        li: a(href="#!") Windows
+            span.badge 10
+
+    main
+        .row
+            .col.s12
+                .card
+                    .card-content
+                        span.card-title= data.domain.name
+                        .row
+                            .col.s12
+                                .card.grey.lighten-4
+                                    .card-content
+                                        .row
+                                            .col.s4.center-align.darken-1.vm-spec
+                                                h5 vCPU: #{data.domain.vcpus}
+                                            .col.s4.center-align.darken-1.vm-spec
+                                                h5 RAM: #{data.domain.memory / 1048576} GB
+                                            .col.s4.center-align.darken-1.vm-spec
+                                                h5 Max. Memory #{data.domain.maxMemory / 1048576} GB
+                        .row
+                            .col.s12
+                                .card.grey.lighten-4
+                                    .card-content
+                                        span.card-title Volumes
+                                        .row
+                                        .divider
+                                            a.btn-floating.halfway-fab.waves-effect.waves-light.green(onclick="open_delete_modal('" + name + "')")
+                                                i.material-icons link
+                                        table.centered
+                                            thead
+                                                tr
+                                                    th.vol-name Volume Name
+                                                    th.vol-bar.hide-on-small-only
+                                                    th.vol-alloc Allocated/Capacity
+                                                    th.vol-del Actions
+                                            tbody
+                                                each vol in data.domain.volumes
+                                                    tr: +vol(vol.name, vol.allocation / 1048576, vol.capacity / 1048576)
+                        .row
+                            .col.s12
+                                .card.grey.lighten-4
+                                    .card-content
+                                        span.card-title ISO image
+                                            a.btn-flat.green.non-clickable.right.cd-status Attached
+                                        .row
+                                        .divider
+                                        .row
+                                        .row
+                                            .input-field.col.s12
+                                                select
+                                                    option(value="" disabled selected) Choose a ISO to mount
+                                                    option(value="1") Debian 9
+                                                    option(value="2") Debian 8
+                                                    option(value="3") Windows 10
+                                                label Select a image and press Apply
+                                    .card-action
+                                        a.waves-effect.waves-green.btn(href="#!") Apply / Attach
+                                        a.waves-effect.waves-red.btn.red.right(href="#!") Detach
+
+
+    include main_scripts
+    script(src="/javascripts/initMaterialize.js")
+    script(src="/javascripts/api_calls/req_config.js")
+    script(src="/javascripts/api_calls/token_manager.js")
+    script(src="/javascripts/api_calls/api_req.js")

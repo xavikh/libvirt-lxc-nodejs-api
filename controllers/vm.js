@@ -68,9 +68,32 @@ function attachCdrom(req, res) {
     let vm = {
         name: name
     };
-    domains_lvirt.attachCdrom(vm, iso, (err, success) => {
+    domains_lvirt.aCdromIsAttached(vm, (err, isAttached) => {
         if (err) return setErrorRes(res, err);
-        return res.status(200).send({message: success});
+        if(isAttached) {
+            domains_lvirt.detachCdrom(vm, (err, success) => {
+                domains_lvirt.attachCdrom(vm, iso, (err, success) => {
+                    if (err) return setErrorRes(res, err);
+                    return res.status(200).send({message: success});
+                })
+            });
+        } else {
+            domains_lvirt.attachCdrom(vm, iso, (err, success) => {
+                if (err) return setErrorRes(res, err);
+                return res.status(200).send({message: success});
+            })
+        }
+    });
+}
+
+function getMountedCdRom(req, res){
+    const name = req.params.name;
+    let vm = {
+        name: name
+    };
+
+    domains_lvirt.getMountedCdrom(vm, (err, cdrom) => {
+
     })
 }
 
@@ -151,20 +174,7 @@ function getDomainInfo(req, res) {
 function getDomainInfoList(req, res) {
     domains_lvirt.getDomainInfoList((err, infos) => {
         if (err) return setErrorRes(res, err);
-        let promises = infos.map((info) => {
-            return new Promise((resolve, reject) => {
-                volumes_lvirt.populateVolumesInfo(info, (err, popInfo) => {
-                    if (err) reject(err);
-                    info.volumes = popInfo;
-                    resolve(info);
-                });
-            });
-        });
-        Promise.all(promises).then((infos) => {
-            return res.status(200).send(infos);
-        }).catch((err) => {
-            return res.status(500).send(err);
-        });
+        return res.status(200).send(infos);
     });
 }
 

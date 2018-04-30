@@ -1,11 +1,11 @@
 extends layout
 
 mixin vm(name, vcpu, ram, allocation, capacity, status)
-    td.name #{name}
-    td #{vcpu}
-    td.ram #{ram}
-    td.storage #{allocation} / #{capacity}
-    td.status
+    td.name(onclick="location.href = '/dashboard/vm/" + name + "';") #{name}
+    td.vcpu(onclick="location.href = '/dashboard/vm/" + name + "';") #{vcpu}
+    td.ram(onclick="location.href = '/dashboard/vm/" + name + "';") #{ram}
+    td.storage(onclick="location.href = '/dashboard/vm/" + name + "';") #{allocation} / #{capacity}
+    td.status(onclick="location.href = '/dashboard/vm/" + name + "';")
         case status
             when "running"
                 a.btn-flat.green.non-clickable #{status}
@@ -31,7 +31,6 @@ mixin vm(name, vcpu, ram, allocation, capacity, status)
 
 
 block content
-
     #modalCreateVm.modal
         .modal-content
             form.col.s12
@@ -67,24 +66,11 @@ block content
             a.modalBtn.modal-action.modal-close.waves-effect.waves-red.btn.red(href="#!" onclick="remove_vm()") Delete
             a.modal-action.modal-close.waves-effect.waves-grey.btn.grey.lighten-1(href="#!") Cancel
 
-    //ul#dropdown1.dropdown-content
-    //    li: a(href="#!") one
-    //    li: a(href="#!") two
-    //    li.divider(tabindex="-1")
-    //    li: a(href="#!") three
-    //    li: a(href="#!")
-    //        i.material-icons view_module
-    //        | four
-    //    li: a(href="#!")
-    //        i.material-icons cloud
-    //        | five
-
-
     include header-nav
 
     main
         .fixed-action-btn
-            a.btn-floating.btn-large.red.modal-trigger(href="#modalCreateVm")
+            a.btn-floating.btn-large.green.modal-trigger(href="#modalCreateVm")
                 i.large.material-icons add
             ul
                 li: a.btn-floating.yellow.darken-1.modal-trigger(href="#modalCreateVm"): i.material-icons content_copy
@@ -101,7 +87,7 @@ block content
                         th Ram
                         th Volume
                         th Status
-                        th Action
+                        th Actions
                 tbody
                     if !data.domains || data.domains.length < 1
                         -emptyList = true

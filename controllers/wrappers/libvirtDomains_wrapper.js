@@ -4,13 +4,13 @@ const modelToXML = require('../../services/libvirt_helpers').modelToXML;
 const setError = require('./errorsLibvirt').setError;
 const parseError = require('./errorsLibvirt').parseError;
 const lvirt = require('./libvirt_wrapper');
+const volumes_lvirt = require('./libvirtVolumes_wrapper');
 
 function defineDomain(vm, next) {
     lvirt.connect((err) => {
         if (err) return next(err);
         getDomainByName(vm.name, (err, vmExist) => {
-            if (err) return next(err);
-            if (vmExist) return next(setError(409,"A VM with this name already exist"));
+            if (vmExist) return next(setError(409, "A VM with this name already exist"));
 
             modelToXML(vm, 'vm_base.xml', (err, xml) => {
                 if (err) return next(setError(500, "A error occurred parsing the VM to XML"));
@@ -75,12 +75,7 @@ function getDomainInfoList(next) {
             return new Promise((resolve, reject) => {
                 getDomainInfo(vm, (err, info) => {
                     if (err) reject(err);
-                    info.name = vm.name;
-                    getMountedVolumes(vm, (err, vol_list) => {
-                        if (err) reject(err);
-                        info.volumesNames = vol_list;
-                        resolve(info);
-                    });
+                    resolve(info);
                 });
             });
         });
@@ -98,7 +93,16 @@ function getDomainInfo(vm, next) {
         if (err) return next(err);
         domain.getInfo((err, info) => {
             if (err) return next(parseError(err));
-            next(null, info);
+            info.name = vm.name;
+            getMountedVolumes(vm, (err, vol_list) => {
+                if (err) next(err);
+                info.volumesNames = vol_list;
+                volumes_lvirt.populateVolumesInfo(info, (err, popInfo) => {
+                    if (err) next(err);
+                    info.volumes = popInfo;
+                    next(null, info);
+                });
+            });
         })
     });
 }
@@ -110,6 +114,23 @@ function getMountedVolumes(vm, next) {
             if (err) return next(err);
 
             let regex = /<source dev='\/dev\/centos\/([^']+)'\/>/g;
+            let matched;
+            let output = [];
+            while (matched = regex.exec(xml)) {
+                output.push(matched[1]);
+            }
+            return next(null, output);
+        });
+    });
+}
+
+function getMountedCdrom(vm, next) {
+    getDomainByName(vm.name, (err, vm) => {
+        if (err) return next(err);
+        vm.toXml((err, xml) => {
+            if (err) return next(err);
+
+            let regex = /<source file='\/isos\/([^']+)'\/>/g;
             let matched;
             let output = [];
             while (matched = regex.exec(xml)) {
@@ -139,6 +160,18 @@ function attachCdrom(vm, iso, next) {
                     next(null, domain !== undefined);
                 });
             });
+        });
+    });
+}
+
+function aCdromIsAttached(vm, next) {
+    getDomainByName(vm.name, (err, vm) => {
+        if (err) return next(err);
+        vm.toXml((err, xml) => {
+            if (err) return next(err);
+            if (xml.search("<boot dev='cdrom'/>") !== -1) return next(null, true);
+            if (xml.search("<disk type='block' device='cdrom'>") !== -1) return next(null, true);
+            return next(null, false);
         });
     });
 }
@@ -247,6 +280,8 @@ module.exports = {
     getDomainInfo,
     getDomainInfoList,
     attachCdrom,
+    getMountedCdrom,
+    aCdromIsAttached,
     detachCdrom,
     attachDisk,
     detachDisk,

@@ -1,13 +1,16 @@
-
 $white_color: #f0f0f0;
 $gray_color: #303030;
 $green_accent_color: #53ca1e;
 
-html,body { height: 100%; margin: 0; padding: 0; }
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
 
 header, main, footer {
   padding-left: 300px;
-  @media only screen and (max-width : 992px) {
+  @media only screen and (max-width: 992px) {
     padding-left: 0;
   }
 }
@@ -42,31 +45,45 @@ nav {
 
 .name {
   font-weight: bold;
+  cursor: pointer;
+}
+
+.vcpu {
+  cursor: pointer;
+}
+
+.ram {
+  cursor: pointer;
 }
 
 .ram::after {
   content: " GB";
 }
 
+.storage {
+  cursor: pointer;
+}
+
 .storage::after {
   content: " MB";
+}
+
+.status {
+  width: 200px;
+  cursor: pointer;
+}
+
+.status a {
+  color: #f0f0f0;
+  font-weight: bold;
 }
 
 .action {
   width: 300px;
 }
 
-.action a{
+.action a {
   margin-right: 3px;
-}
-
-.status {
-  width: 200px;
-}
-
-.status a{
-  color: #f0f0f0;
-  font-weight: bold;
 }
 
 .non-clickable {
@@ -83,7 +100,7 @@ nav {
   overflow: auto;
 }
 
-.card .card-title{
+.card .card-title {
   font-size: 2.8em;
 }
 
@@ -107,4 +124,51 @@ nav {
 
 .modal > .modal-footer > .modalBtn {
   margin-right: 15px;
+}
+
+.vm-card {
+  margin: 10px;
+}
+
+.vm-title-cont {
+  height: 80px;
+}
+
+.vm-title {
+  color: white;
+  font-size: 2em;
+  padding-left: 0.6em;
+}
+
+.vm-spec {
+  //color: white;
+}
+
+.vol-name {
+  width: 10%;
+}
+
+.vol-bar {
+  width: 30%;
+}
+
+.vol-alloc {
+  width: 10%;
+}
+
+.vol-del {
+  width: 12%;
+}
+
+
+.vol-del-btn {
+  margin-left: 4px;
+}
+
+.isos-dropdown {
+  width: 300px;
+}
+
+.cd-status{
+  color: #f0f0f0;
 }
