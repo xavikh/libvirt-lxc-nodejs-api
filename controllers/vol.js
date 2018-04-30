@@ -1,7 +1,7 @@
 
-const setErrorRes = require('../errorsLibvirt').setErrorRes;
+const setErrorRes = require('./wrappers/errorsLibvirt').setErrorRes;
 
-const lvirt = require('../controllers/libvirtAPI_wrapper');
+const volumes_lvirt = require('../controllers/wrappers/libvirtVolumes_wrapper');
 
 function createVolume(req, res) {
     let name = req.body.name;
@@ -13,21 +13,21 @@ function createVolume(req, res) {
 
     if(name === "swap" || name === "root") return res.sendStatus(400);
 
-    lvirt.createVolume(vol, (err, success) => {
+    volumes_lvirt.createVolume(vol, (err, success) => {
         if(err) return setErrorRes(res, err);
         return res.status(200).send(success);
     });
 }
 
-function getVolume(req, res) {
+function getVolumeInfo(req, res) {
     let name = req.params.name;
 
     if(name === "swap" || name === "root") return res.sendStatus(400);
 
-    lvirt.getVolumeByName(name, (err, volume) => {
+    volumes_lvirt.getVolumeByName(name, (err, volume) => {
         if(err) return setErrorRes(res, err);
 
-        lvirt.getInfo(volume,(err, info) => {
+        volumes_lvirt.getVolInfo(volume,(err, info) => {
             if(err) return setErrorRes(res, err);
             return res.status(200).send(info);
         });
@@ -35,7 +35,7 @@ function getVolume(req, res) {
 }
 
 function getVolumeList(req, res) {
-    lvirt.getVolumeList((err, volumes) => {
+    volumes_lvirt.getVolumeList((err, volumes) => {
         if(err) return setErrorRes(res, err);
 
         let index = volumes.indexOf("root");
@@ -56,7 +56,7 @@ function removeVolume(req, res) {
 
     if(name === "swap" || name === "root") return res.sendStatus(400);
 
-    lvirt.removeVolume(vol, (err, success) => {
+    volumes_lvirt.removeVolume(vol, (err, success) => {
         if(err) return setErrorRes(res, err);
         return res.status(200).send({message: success});
     })
@@ -75,7 +75,7 @@ function cloneVolume(req, res) {
         name: cloneVolName
     };
 
-    lvirt.cloneVolume(vol, volClone, (err, cloneVolume) => {
+    volumes_lvirt.cloneVolume(vol, volClone, (err, cloneVolume) => {
         if(err) return setErrorRes(res, err);
 
         res.status(200).send({message: "Everything is OK"});
@@ -84,7 +84,7 @@ function cloneVolume(req, res) {
 
 module.exports = {
     createVolume,
-    getVolume,
+    getVolumeInfo,
     getVolumeList,
     removeVolume,
     cloneVolume

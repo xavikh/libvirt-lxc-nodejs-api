@@ -1,4 +1,3 @@
-
 function login() {
     let data = {
         email: $('#email').val(),
@@ -50,50 +49,63 @@ function signup() {
     })
 }
 
-function create_vm(){
+function create_vm() {
     let data = {
         name: $('#vmname').val(),
         vcpu: Math.floor(document.getElementById('slider-step-cpu').noUiSlider.get()),
         ram: Math.floor(document.getElementById('slider-step-ram').noUiSlider.get()),
         volume_size: Math.floor(document.getElementById('slider-step-st').noUiSlider.get())
     };
-    if(!data.name ||
+    if (!data.name ||
         !data.vcpu ||
         !data.ram ||
-        !data.volume_size){
+        !data.volume_size) {
         return M.toast({html: "A parameter is missing", classes: "red"});
     }
+    M.toast({html: "Processing...", classes: "amber"});
     request('POST', '/vm', getToken(), data, (response) => {
-        M.toast({html: "Processing...", classes: "green"});
+        M.toast({html: "VM created", classes: "green"});
         $('#modalCreateVm').modal('close');
-        setTimeout(location.reload(), 1000);
+        setTimeout(() => {location.reload()}, 1000);
     })
 }
 
 function change_vm_status(name, status) {
+    M.toast({html: "Processing...", classes: "amber"});
     request('PUT', '/vm/' + name + '/' + status, getToken(), null, (response) => {
-        M.toast({html: "Processing...", classes: "green"});
-        setTimeout(location.reload(), 1000);
+        M.toast({html: "Action completed", classes: "green"});
+        setTimeout(() => {location.reload()}, 1000);
     })
 }
 
-function open_delete_modal(name){
+function open_delete_modal(name) {
     $('#modalDeleteVm').data('vmname', name).modal('open');
 }
 
 function remove_vm() {
     let name = $('#modalDeleteVm').data('vmname');
     let delStorage = $('#deleteStorage').prop('checked');
-    request('DELETE', '/vm/' + name, getToken(), null, (response) => {
-        M.toast({html: "Processing VM deletion...", classes: "green"});
-        if(delStorage){
-            request('DELETE', '/vol/' + name, getToken(), null, (response) => {
-                M.toast({html: "Processing VOL deletion...", classes: "green"});
-                setTimeout(location.reload(), 2000);
+
+    if (delStorage) {
+        request('GET', '/vm/' + name + '/volumes', getToken(), null, (response) => {
+            for (let i in response.volumes) {
+                M.toast({html: "Deleting " + response.volumes[i] + " volume...", classes: "amber"});
+                request('DELETE', '/vol/' + response.volumes[i], getToken(), null, (response) => {
+                    M.toast({html: response.volumes[i] + " deletion complete", classes: "green"});
+                });
+            }
+            M.toast({html: "Deleteing " + name + " virtual machine...", classes: "amber"});
+            request('DELETE', '/vm/' + name, getToken(), null, (response) => {
+                M.toast({html: "VM deletion complete", classes: "green"});
+                setTimeout(() => {location.reload()}, 5000);
             });
-        } else {
-            setTimeout(location.reload(), 2000);
-        }
-    });
+        });
+    } else {
+        M.toast({html: "Deleteing " + name + " virtual machine...", classes: "amber"});
+        request('DELETE', '/vm/' + name, getToken(), null, (response) => {
+            M.toast({html: "VM deletion complete", classes: "green"});
+            setTimeout(() => {location.reload()}, 3000);
+        });
+    }
 
 }

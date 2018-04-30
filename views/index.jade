@@ -25,6 +25,10 @@ mixin vm(name, vcpu, ram, allocation, capacity, status)
             i.material-icons power
         a.waves-effect.waves-light.btn-small.grey.darken-4(onclick="open_delete_modal('" + name + "')")
             i.material-icons delete
+        //a.waves-effect.waves-light.btn-small.dropdown-trigger.grey.darken-2(data-target='dropdown1')
+        //    i.material-icons more_vert
+
+
 
 block content
 
@@ -63,6 +67,17 @@ block content
             a.modalBtn.modal-action.modal-close.waves-effect.waves-red.btn.red(href="#!" onclick="remove_vm()") Delete
             a.modal-action.modal-close.waves-effect.waves-grey.btn.grey.lighten-1(href="#!") Cancel
 
+    //ul#dropdown1.dropdown-content
+    //    li: a(href="#!") one
+    //    li: a(href="#!") two
+    //    li.divider(tabindex="-1")
+    //    li: a(href="#!") three
+    //    li: a(href="#!")
+    //        i.material-icons view_module
+    //        | four
+    //    li: a(href="#!")
+    //        i.material-icons cloud
+    //        | five
 
 
     include header-nav
@@ -91,14 +106,19 @@ block content
                     if !data.domains || data.domains.length < 1
                         -emptyList = true
                     else
-                        for vm in data.domains
-                            tr: +vm(vm.name, vm.vcpus, vm.memory / 1048576, vm.volume.allocation / 1048576, vm.volume.capacity / 1048576, vm.state)
+                        each vm in data.domains
+                            -allocation = 0
+                            -capacity = 0
+                            each vol in vm.volumes
+                                -allocation += vol.allocation
+                                -capacity += vol.capacity
+                            tr: +vm(vm.name, vm.vcpus, vm.memory / 1048576, allocation / 1048576, capacity / 1048576, vm.state)
 
         if emptyList
             p.center Empty list
 
     include main_scripts
-    script(src="javascripts/initMaterialize.js")
-    script(src="javascripts/api_calls/req_config.js")
-    script(src="javascripts/api_calls/token_manager.js")
-    script(src="javascripts/api_calls/api_req.js")
+    script(src="/javascripts/initMaterialize.js")
+    script(src="/javascripts/api_calls/req_config.js")
+    script(src="/javascripts/api_calls/token_manager.js")
+    script(src="/javascripts/api_calls/api_req.js")

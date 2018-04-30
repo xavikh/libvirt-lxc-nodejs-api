@@ -10,6 +10,8 @@ $(document).ready(function(){
     $('.modal').modal();
 });
 
+$('.dropdown-trigger').dropdown();
+
 /////////////////////
 
 var stepSlidercpu = document.getElementById('slider-step-cpu');

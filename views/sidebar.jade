@@ -1,9 +1,9 @@
 ul#slide-out.sidenav.sidenav-fixed
     li: .user-view
         .background
-            img(src='images/bg.jpg')
+            img(src='/images/bg.jpg')
         a.non-clickable(href='#user')
-            img.circle(src='images/user_profile_photo.jpg')
+            img.circle(src='/images/user_profile_photo.jpg')
         a.non-clickable(href='#name')
             span.white-text.name John Doe
         a.non-clickable(href='#email')
@@ -14,6 +14,9 @@ ul#slide-out.sidenav.sidenav-fixed
     li: a.waves-effect(href='#!')
         i.material-icons storage
         | Volumes
+    li: a.waves-effect(href='#!')
+        i.material-icons show_chart
+        | Stats
     li: a.disabled.non-clickable(href='#!')
         i.material-icons layers
         | Containers [not available yet]

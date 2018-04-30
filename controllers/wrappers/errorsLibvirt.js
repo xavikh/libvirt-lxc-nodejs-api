@@ -115,7 +115,15 @@ function setErrorRes(res, err) {
     res.status(err.code).send({"message" : err.message});
 }
 
+function setError(code, message) {
+    return {
+        "code": code,
+        "message": message
+    };
+}
+
 module.exports = {
     parseError,
-    setErrorRes
+    setErrorRes,
+    setError
 };

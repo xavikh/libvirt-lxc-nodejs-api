@@ -10,7 +10,7 @@ const volCtrl = require ('../controllers/vol');
 
 router.post('/', volCtrl.createVolume);
 router.get('/', volCtrl.getVolumeList);
-router.get('/:name', volCtrl.getVolume);
+router.get('/:name', volCtrl.getVolumeInfo);
 router.delete('/:name', volCtrl.removeVolume);
 router.post('/clone/:name', volCtrl.cloneVolume)
 

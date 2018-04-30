@@ -1,8 +1,8 @@
-const setErrorRes = require('../errorsLibvirt').setErrorRes;
-const parseError = require('../errorsLibvirt').parseError;
+const setErrorRes = require('./wrappers/errorsLibvirt').setErrorRes;
+const parseError = require('./wrappers/errorsLibvirt').parseError;
 
-const lvirt = require('../controllers/libvirtAPI_wrapper');
-
+const domains_lvirt = require('../controllers/wrappers/libvirtDomains_wrapper');
+const volumes_lvirt = require('../controllers/wrappers/libvirtVolumes_wrapper');
 
 function createDomain(req, res) {
     const name = req.body.name;
@@ -23,23 +23,24 @@ function createDomain(req, res) {
         "name": vm.name,
         "size": volumeSize
     };
-    lvirt.defineDomain(vm, (err, success) => {
+
+    domains_lvirt.defineDomain(vm, (err, success) => {
         if (err) return setErrorRes(res, err);
         if (!volume || volume === name) {
-            lvirt.createVolume(vol, (err, success) => {
+            volumes_lvirt.createVolume(vol, (err, success) => {
                 if (err) return setErrorRes(res, err);
                 return res.status(200).send(success);
             });
         } else {
-            lvirt.cloneVolume(clone, vol, (err, success) => {
+            volumes_lvirt.cloneVolume(clone, vol, (err, success) => {
                 if (err) return setErrorRes(res, err);
                 return res.status(200).send(success);
             });
         }
-    })
+    });
 }
 
-function editDomain(req, res){
+function editDomain(req, res) {
     const name = req.params.name;
     const editType = req.body.editType;
     const iso = req.body.iso;
@@ -54,8 +55,8 @@ function editDomain(req, res){
         storagePath: "/dev/centos/" + volName
     };
 
-    lvirt.editDomain(vm, edit, (err, success) => {
-        if(err) return setErrorRes(res, err);
+    domains_lvirt.editDomain(vm, edit, (err, success) => {
+        if (err) return setErrorRes(res, err);
         return res.status(200).send({message: success});
     })
 }
@@ -67,9 +68,10 @@ function attachCdrom(req, res) {
     let vm = {
         name: name
     };
-    let edit = {
-        iso: iso
-    };
+    domains_lvirt.attachCdrom(vm, iso, (err, success) => {
+        if (err) return setErrorRes(res, err);
+        return res.status(200).send({message: success});
+    })
 }
 
 function detachCdrom(req, res) {
@@ -78,9 +80,11 @@ function detachCdrom(req, res) {
     let vm = {
         name: name
     };
-    let edit = {
-        iso: iso
-    };
+
+    domains_lvirt.detachCdrom(vm, (err, success) => {
+        if (err) return setErrorRes(res, err);
+        return res.status(200).send({message: success});
+    })
 }
 
 function attachDisk(req, res) {
@@ -90,9 +94,12 @@ function attachDisk(req, res) {
     let vm = {
         name: name
     };
-    let edit = {
-        storagePath: "/dev/centos/" + volName
-    };
+    let volPath = "/dev/centos/" + volName;
+
+    domains_lvirt.attachDisk(vm, volPath, (err, success) => {
+        if (err) return setErrorRes(res, err);
+        return res.status(200).send({message: success});
+    })
 }
 
 function detachDisk(req, res) {
@@ -102,9 +109,12 @@ function detachDisk(req, res) {
     let vm = {
         name: name
     };
-    let edit = {
-        storagePath: "/dev/centos/" + volName
-    };
+    let volPath = "/dev/centos/" + volName;
+
+    domains_lvirt.detachDisk(vm, volPath, (err, success) => {
+        if (err) return setErrorRes(res, err);
+        return res.status(200).send({message: success});
+    })
 }
 
 
@@ -112,7 +122,7 @@ function getDomain(req, res) {
     let vm = {
         "name": req.params.name
     };
-    lvirt.getDomainByName(vm.name, (err, domain) => {
+    domains_lvirt.getDomainByName(vm.name, (err, domain) => {
         if (err) return setErrorRes(res, err);
         domain.toXml((err, xml) => {
             if (err) return setErrorRes(res, err);
@@ -121,28 +131,41 @@ function getDomain(req, res) {
     })
 }
 
-function getDomainInfo(req, res) {
-    let vm = {
-        name: name
-    };
-    lvirt.getDomainInfo(vm, (err, info) => {
-        if (err) return res.status(200).send(err);
-        return res.status(200).send({info});
-    })
-}
-
 function getDomainList(req, res) {
-    lvirt.getDomainList((err, domains) => {
+    domains_lvirt.getDomainList((err, domains) => {
         if (err) return setErrorRes(res, err);
         return res.status(200).send(domains);
     })
 }
 
-function getDomainInfoList(req, res) {
-    lvirt.getDomainInfoList((err, infos) => {
-        if (err) return setErrorRes(res, err);
-        return res.status(200).send(infos);
+function getDomainInfo(req, res) {
+    let vm = {
+        name: req.params.name
+    };
+    domains_lvirt.getDomainInfo(vm, (err, info) => {
+        if (err) return res.status(200).send(err);
+        return res.status(200).send({info});
     })
+}
+
+function getDomainInfoList(req, res) {
+    domains_lvirt.getDomainInfoList((err, infos) => {
+        if (err) return setErrorRes(res, err);
+        let promises = infos.map((info) => {
+            return new Promise((resolve, reject) => {
+                volumes_lvirt.populateVolumesInfo(info, (err, popInfo) => {
+                    if (err) reject(err);
+                    info.volumes = popInfo;
+                    resolve(info);
+                });
+            });
+        });
+        Promise.all(promises).then((infos) => {
+            return res.status(200).send(infos);
+        }).catch((err) => {
+            return res.status(500).send(err);
+        });
+    });
 }
 
 function removeDomain(req, res) {
@@ -152,7 +175,7 @@ function removeDomain(req, res) {
         "ram": 2048, //MiB
         "storagePath": "/dev/centos/vm1"
     };
-    lvirt.removeDomain(vm, (err, success) => {
+    domains_lvirt.removeDomain(vm, (err, success) => {
         if (err) return setErrorRes(res, err);
         return res.status(200).send({message: success});
     })
@@ -176,7 +199,7 @@ function attachDevice(req, res) {
         name: req.body.iso
     };
 
-    lvirt.attachDevice(vm, device, (err, result) => {
+    domains_lvirt.attachDevice(vm, device, (err, result) => {
         if (err) return res.status(500).send(err);
         res.status(200).send({result: result});
     })
@@ -190,9 +213,19 @@ function attachDeviceTest(req, res) {
         name: req.body.iso
     };
 
-    lvirt.attachDeviceTest(vm, device, (err, result) => {
+    domains_lvirt.attachDeviceTest(vm, device, (err, result) => {
         if (err) return res.status(500).send(err);
         res.status(200).send({result: result});
+    })
+}
+
+function getMountedVolumes(req, res) {
+    let vm = {
+        name: req.params.name
+    };
+    domains_lvirt.getMountedVolumes(vm, (err, result) => {
+        if (err) return res.status(500).send(err);
+        res.status(200).send({volumes: result});
     })
 }
 
@@ -202,7 +235,7 @@ function statusDomain(req, res) {
         name: req.params.name
     };
 
-    lvirt.getDomainByName(vm.name, (err, domain) => {
+    domains_lvirt.getDomainByName(vm.name, (err, domain) => {
         if (err) return setErrorRes(res, err);
         switch (status) {
             case "start":
@@ -258,10 +291,15 @@ module.exports = {
     getDomain,
     getDomainList,
     getDomainInfoList,
+    attachCdrom,
+    detachCdrom,
+    attachDisk,
+    detachDisk,
     removeDomain,
     isoList,
     attachDevice,
     attachDeviceTest,
+    getMountedVolumes,
     statusDomain,
     getDomainInfo
 };
