@@ -94,16 +94,20 @@ function getDomainInfo(vm, next) {
         domain.getInfo((err, info) => {
             if (err) return next(parseError(err));
             info.name = vm.name;
-            getMountedVolumes(vm, (err, vol_list) => {
-                if (err) next(err);
-                info.volumesNames = vol_list;
-                volumes_lvirt.populateVolumesInfo(info, (err, popInfo) => {
+            getMountedCdrom(vm, (err, mountedCd) => {
+                if(err) next(err);
+                info.iso = mountedCd;
+                getMountedVolumes(vm, (err, vol_list) => {
                     if (err) next(err);
-                    info.volumes = popInfo;
-                    next(null, info);
+                    info.volumesNames = vol_list;
+                    volumes_lvirt.populateVolumesInfo(info, (err, popInfo) => {
+                        if (err) next(err);
+                        info.volumes = popInfo;
+                        next(null, info);
+                    });
                 });
             });
-        })
+        });
     });
 }
 
@@ -131,12 +135,11 @@ function getMountedCdrom(vm, next) {
             if (err) return next(err);
 
             let regex = /<source file='\/isos\/([^']+)'\/>/g;
-            let matched;
-            let output = [];
-            while (matched = regex.exec(xml)) {
-                output.push(matched[1]);
-            }
-            return next(null, output);
+            let match = regex.exec(xml);
+            if(match)
+                return next(null, match[1]);
+            else
+                return next(null, undefined);
         });
     });
 }

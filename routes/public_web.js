@@ -7,6 +7,7 @@ const auth = require('../middlewares/auth');
 
 const domains_lvirt = require('../controllers/wrappers/libvirtDomains_wrapper');
 const volumes_lvirt = require('../controllers/wrappers/libvirtVolumes_wrapper');
+const system = require('../controllers/wrappers/system_wrapper');
 
 
 //PUBLIC
@@ -43,12 +44,17 @@ router.get('/dashboard/vm/:name', /*auth,*/ (req, res) => {
     };
 
     domains_lvirt.getDomainInfo(vm, (err, info) => {
-        let data = {
-            title: "CDWS",
-            domain: info
-        };
-        return res.render('virtual_machine', {data: data});
-    })
+        if(err) return setErrorRes(res, err);
+        system.isoList((err, isos) => {
+            if(err) return setErrorRes(res, err);
+            let data = {
+                title: "CDWS",
+                domain: info,
+                isos: isos
+            };
+            return res.render('virtual_machine', {data: data});
+        });
+    });
 });
 
 module.exports = router;

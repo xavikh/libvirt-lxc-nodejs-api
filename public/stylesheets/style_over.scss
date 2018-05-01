@@ -15,6 +15,13 @@ header, main, footer {
   }
 }
 
+main {
+  padding: 6px 6px 6px 306px;
+  @media only screen and (max-width: 992px) {
+    padding: 1px;
+  }
+}
+
 nav {
   background-color: $gray_color;
 }
@@ -134,10 +141,11 @@ nav {
   height: 80px;
 }
 
-.vm-title {
-  color: white;
-  font-size: 2em;
-  padding-left: 0.6em;
+.card > .card-content > .vm-title {
+  padding-bottom: 10px;
+  font-size: 3.5em;
+  font-weight: 600;
+  //color: #f0f0f0;
 }
 
 .vm-spec {
@@ -160,9 +168,9 @@ nav {
   width: 12%;
 }
 
-
 .vol-del-btn {
   margin-left: 4px;
+  margin-bottom: 3px;
 }
 
 .isos-dropdown {

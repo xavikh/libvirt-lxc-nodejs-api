@@ -3,6 +3,7 @@ const parseError = require('./wrappers/errorsLibvirt').parseError;
 
 const domains_lvirt = require('../controllers/wrappers/libvirtDomains_wrapper');
 const volumes_lvirt = require('../controllers/wrappers/libvirtVolumes_wrapper');
+const system = require('../controllers/wrappers/system_wrapper');
 
 function createDomain(req, res) {
     const name = req.body.name;
@@ -192,13 +193,10 @@ function removeDomain(req, res) {
 }
 
 function isoList(req, res) {
-    const testFolder = '/isos/';
-    const fs = require('fs');
-
-    fs.readdir(testFolder, (err, files) => {
+    system.isoList((err, isos) => {
         if (err) return res.status(500).send({message: err});
-        res.status(200).send({isos: files});
-    })
+        res.status(200).send({isos: isos});
+    });
 }
 
 function attachDevice(req, res) {
