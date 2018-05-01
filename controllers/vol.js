@@ -79,7 +79,7 @@ function cloneVolume(req, res) {
     volumes_lvirt.cloneVolume(vol, volClone, (err, cloneVolume) => {
         if(err) return setErrorRes(res, err);
 
-        res.status(200).send({message: "Everything is OK"});
+        res.status(200).send({message: "Volume " + volName + " cloned in " + cloneVolName});
     })
 }
 

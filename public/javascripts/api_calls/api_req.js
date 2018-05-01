@@ -120,7 +120,7 @@ function remove_vm() {
                     M.toast({html: response.volumes[i] + " deletion complete", classes: "green"});
                 });
             }
-            M.toast({html: "Deleteing " + name + " virtual machine...", classes: "amber"});
+            M.toast({html: "Deleting " + name + " virtual machine...", classes: "amber"});
             request('DELETE', '/vm/' + name, getToken(), null, (response) => {
                 M.toast({html: "VM deletion complete", classes: "green"});
                 setTimeout(() => {
@@ -175,9 +175,6 @@ function attachVol(vm_name, vol_name) {
     M.toast({html: "Attaching " + vol_name + " volume...", classes: "amber"});
     request('PUT', '/vm/' + vm_name + '/attach-disk', getToken(), data, (response) => {
         M.toast({html: vol_name + " attaching complete", classes: "green"});
-        setTimeout(() => {
-            location.reload()
-        }, 1000);
     });
 }
 
@@ -201,17 +198,16 @@ function open_attach_vol_modal(vm_name) {
     let vol_select = $('#vol_select');
     attachBtn.off("click");
     attachBtn.click(function () {
-        console.log(vol_select.formSelect('getSelectedValues').length);
-        console.log(vol_select.formSelect('getSelectedValues')[0]);
-        if(vol_select.formSelect('getSelectedValues').length > 0) {
-            for (let select_vol in vol_select.formSelect('getSelectedValues')) {
+        let selection = vol_select.formSelect('getSelectedValues');
+        if (selection.length > 0) {
+            for (let select_vol in selection) {
                 setTimeout(() => {
-                    attachVol(vm_name, vol_select.formSelect('getSelectedValues')[select_vol]);
+                    attachVol(vm_name, selection[select_vol]);
                 }, 2000 * select_vol);
             }
             setTimeout(() => {
                 location.reload()
-            }, 3000 * vol_select.formSelect('getSelectedValues').length);
+            }, 3000 * selection.length);
         } else {
             M.toast({html: "Must select at least one volume", classes: "red"});
         }
@@ -223,7 +219,6 @@ function open_attach_vol_modal(vm_name) {
 
         vol_select.prop('selectedIndex', 0);
         vol_select.formSelect();
-        //console.log(vol_select.formSelect('getSelectedValues'));
 
         modal.modal('open');
     });
@@ -240,4 +235,52 @@ function open_detach_vol_modal(vm_name, vol_name) {
     modal.modal('open');
 }
 
+function attachCdrom(vm_name) {
+    let iso_select = $('#iso_select');
+    iso_select.formSelect();
+    let iso = iso_select.formSelect('getSelectedValues')[0];
 
+    if (iso) {
+        let data = {
+            iso: iso
+        };
+
+        M.toast({html: "Attaching " + data.iso + " image...", classes: "amber"});
+        request('PUT', '/vm/' + vm_name + '/attach-cdrom', getToken(), data, (response) => {
+            M.toast({html: data.iso + " attaching complete", classes: "green"});
+            setTimeout(() => {
+                location.reload()
+            }, 1000);
+        });
+    }
+}
+
+function detachCdrom(vm_name) {
+    M.toast({html: "Detaching image...", classes: "amber"});
+    request('PUT', '/vm/' + vm_name + '/detach-cdrom', getToken(), null, (response) => {
+        M.toast({html: "Detaching complete", classes: "green"});
+        setTimeout(() => {
+            location.reload()
+        }, 1000);
+    });
+}
+
+function cloneVolume(vol_name) {
+    M.toast({
+        html: "<span style='width: 150px;'>Cloning the volume</span></span><div class=\"progress\" style='width: 320px;'>\n" +
+        "<div class=\"indeterminate\"></div>\n" +
+        "</div>", classes: "amber",
+        displayLength: 100000
+    });
+    request('POST', '/vol/' + vol_name + '/clone', getToken(), null, (response) => {
+        M.Toast.dismissAll();
+        M.toast({html: "Volume cloned", classes: "green"});
+        setTimeout(() => {
+            location.reload()
+        }, 1000);
+    });
+}
+
+function deleteVolume(vol_name) {
+    
+}

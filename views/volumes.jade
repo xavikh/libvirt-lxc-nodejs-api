@@ -6,7 +6,7 @@ mixin vol(name, allocation, capacity)
     td.hide-on-small-only: .progress: .determinate(style="width: "+ progress +"%")
     td.vol-storage #{allocation} / #{capacity}
     td
-        a.waves-effect.waves-light.btn-small.vol-del-btn.amber(onclick="open_detach_vol_modal('" + name + "')")
+        a.waves-effect.waves-light.btn-small.vol-del-btn.amber(onclick="cloneVolume('" + name + "')")
             i.material-icons content_copy
         a.waves-effect.waves-light.btn-small.vol-del-btn.grey.darken-4(onclick="open_delete_vol_modal('" + name + "')")
             i.material-icons delete

@@ -73,6 +73,7 @@ function attachCdrom(req, res) {
         if (err) return setErrorRes(res, err);
         if(isAttached) {
             domains_lvirt.detachCdrom(vm, (err, success) => {
+                if (err) return setErrorRes(res, err);
                 domains_lvirt.attachCdrom(vm, iso, (err, success) => {
                     if (err) return setErrorRes(res, err);
                     return res.status(200).send({message: success});

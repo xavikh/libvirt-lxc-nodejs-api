@@ -13,6 +13,6 @@ router.get('/', volCtrl.getVolumeList);
 router.get('/info', volCtrl.getVolumeInfoList);
 router.get('/:name', volCtrl.getVolumeInfo);
 router.delete('/:name', volCtrl.removeVolume);
-router.post('/clone/:name', volCtrl.cloneVolume)
+router.post('/:name/clone', volCtrl.cloneVolume)
 
 module.exports = router;

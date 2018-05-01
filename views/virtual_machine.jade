@@ -5,7 +5,7 @@ mixin vol(name, allocation, capacity)
         -progress = (allocation / capacity)*100
         td #{name}
         td.hide-on-small-only: .progress: .determinate(style="width: "+ progress +"%")
-        td.storage #{allocation} / #{capacity}
+        td.vol-storage #{allocation} / #{capacity}
         td
             a.waves-effect.waves-light.btn-small.vol-del-btn.red(onclick="open_detach_vol_modal('" + data.domain.name+ "', '" + name + "')")
                 i.material-icons eject
@@ -20,8 +20,6 @@ mixin vol(name, allocation, capacity)
                 i.material-icons eject
             a.waves-effect.waves-light.btn-small.vol-del-btn.grey.darken-4(onclick="open_delete_vol_modal('" + data.domain.name + "', '" + name + "')")
                 i.material-icons delete
-
-
 
 block content
 
@@ -114,7 +112,7 @@ block content
                             i.material-icons.small donut_small
                             |  ISO image
                         -if(data.domain.iso)
-                            a.btn-flat.green.non-clickable.right.cd-status Attached
+                            a.btn-flat.green.non-clickable.right.cd-status #{data.domain.iso} &nbsp | &nbsp Attached
                         -else
                             a.btn-flat.red.non-clickable.right.cd-status Detached
                         .row
@@ -122,14 +120,14 @@ block content
                         .row
                         .row
                             .input-field.col.s12
-                                select
+                                select#iso_select
                                     option(value="" disabled selected) Choose a ISO to mount
                                     each iso in data.isos
-                                        option(value='"'+ data.isos +'"')= iso
+                                        option(value= iso)= iso
                                 label Select a image and press Apply
                     .card-action
-                        a.waves-effect.waves-green.btn(href="#!") Apply / Attach
-                        a.waves-effect.waves-red.btn.red.right(href="#!") Detach
+                        a.waves-effect.waves-green.btn(onclick="attachCdrom('"+ data.domain.name +"')") Apply / Attach
+                        a.waves-effect.waves-red.btn.red.right(onclick="detachCdrom('" + data.domain.name + "')") Detach
 
 
     include main_scripts
