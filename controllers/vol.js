@@ -41,6 +41,13 @@ function getVolumeList(req, res) {
     })
 }
 
+function getVolumeInfoList(req, res) {
+    volumes_lvirt.getVolumesInfoList((err, vol_list) => {
+        if (err) return setErrorRes(res, err);
+        return res.status(200).send(vol_list);
+    });
+}
+
 
 function removeVolume(req, res) {
     let name = req.params.name;
@@ -80,6 +87,7 @@ module.exports = {
     createVolume,
     getVolumeInfo,
     getVolumeList,
+    getVolumeInfoList,
     removeVolume,
     cloneVolume
 };

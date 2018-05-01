@@ -3,6 +3,7 @@ const Promise = require("bluebird");
 const modelToXML = require('../../services/libvirt_helpers').modelToXML;
 const setError = require('./errorsLibvirt').setError;
 const parseError = require('./errorsLibvirt').parseError;
+
 const lvirt = require('./libvirt_wrapper');
 const volumes_lvirt = require('./libvirtVolumes_wrapper');
 

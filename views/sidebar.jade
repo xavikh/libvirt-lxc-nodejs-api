@@ -2,6 +2,7 @@ ul#slide-out.sidenav.sidenav-fixed
     li: .user-view
         .background
             img(src='/images/bg.jpg')
+        a.btn-small.waves-light.logout-btn.orange(href='/logout') Log out
         a.non-clickable(href='#user')
         -if(!data.user.avatar_image)
             img.circle(src='/images/user_profile_photo.jpg')
@@ -11,6 +12,7 @@ ul#slide-out.sidenav.sidenav-fixed
             span.white-text.name= data.user.name
         a.non-clickable(href='#email')
             span.white-text.email= data.user.email
+
     case data.section
         when "vm"
             li: a.waves-effect.waves-light.red(href='/dashboard/vm')

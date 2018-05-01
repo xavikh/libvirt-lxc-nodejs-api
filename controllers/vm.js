@@ -89,6 +89,12 @@ function attachCdrom(req, res) {
 
 function getMountedCdRom(req, res){
     const name = req.params.name;
+
+    if(!name) return res.status(400).send({
+        status: 400,
+        message: "The 'name' field isn't correct or is missing"
+    });
+
     let vm = {
         name: name
     };
@@ -100,6 +106,11 @@ function getMountedCdRom(req, res){
 
 function detachCdrom(req, res) {
     const name = req.params.name;
+
+    if(!name) return res.status(400).send({
+        status: 400,
+        message: "The 'name' field isn't correct or is missing"
+    });
 
     let vm = {
         name: name
@@ -115,6 +126,16 @@ function attachDisk(req, res) {
     const name = req.params.name;
     const volName = req.body.volName;
 
+    if(!name) return res.status(400).send({
+        status: 400,
+        message: "The 'name' field isn't correct or is missing"
+    });
+
+    if(!volName) return res.status(400).send({
+        status: 400,
+        message: "The 'volName' field isn't correct or is missing"
+    });
+
     let vm = {
         name: name
     };
@@ -129,6 +150,16 @@ function attachDisk(req, res) {
 function detachDisk(req, res) {
     const name = req.params.name;
     const volName = req.body.volName;
+
+    if(!name) return res.status(400).send({
+        status: 400,
+        message: "The 'name' field isn't correct or is missing"
+    });
+
+    if(!volName) return res.status(400).send({
+        status: 400,
+        message: "The 'volName' field isn't correct or is missing"
+    });
 
     let vm = {
         name: name

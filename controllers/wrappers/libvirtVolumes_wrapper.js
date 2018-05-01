@@ -1,5 +1,4 @@
 const modelToXML = require('../../services/libvirt_helpers').modelToXML;
-const setError = require('./errorsLibvirt').setErrorRes;
 const parseError = require('./errorsLibvirt').parseError;
 const lvirt = require('./libvirt_wrapper');
 
@@ -58,6 +57,7 @@ function getVolumeList(next) {
 }
 
 function getVolInfo(volume, next) {
+    if (!volume) return next({code: 404, message: "The volume didn't exists"});
     volume.getInfo((err, info) => {
         if (err) return next(parseError(err));
         next(null, info);
@@ -69,9 +69,14 @@ function getVolumesInfoList(next) {
         let promises = vol_list.map((vol_name) => {
             return new Promise((resolve, reject) => {
                 getVolumeByName(vol_name, (err, vol) => {
-                    if (err) reject(err);
+                    if (!vol) return resolve({
+                        name: vol_name,
+                        capacity: 0,
+                        allocation: 0
+                    });
+                    if (err) return reject(err);
                     getVolInfo(vol, (err, vol_info) => {
-                        if (err) reject(err);
+                        if (err) return reject(err);
                         vol_info.name = vol_name;
                         resolve(vol_info);
                     });
@@ -82,6 +87,7 @@ function getVolumesInfoList(next) {
         Promise.all(promises).then((info) => {
             next(null, info)
         }).catch((err) => {
+            console.log(err);
             next(err);
         });
     });
@@ -94,9 +100,14 @@ function populateVolumesInfo(vm_info, next) {
     let promises = vol_names.map((vol_name) => {
         return new Promise((resolve, reject) => {
             getVolumeByName(vol_name, (err, vol) => {
-                if (err) reject(err);
+                if (!vol) return  resolve({
+                    name: vol_name,
+                    capacity: 0,
+                    allocation: 0
+                });
+                if (err) return reject(err);
                 getVolInfo(vol, (err, vol_info) => {
-                    if (err) reject(err);
+                    if (err) return reject(err);
                     vol_info.name = vol_name;
                     resolve(vol_info);
                 });

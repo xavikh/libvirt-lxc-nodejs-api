@@ -1,18 +1,67 @@
 extends layout
 
 mixin vol(name, allocation, capacity)
-    -progress = (allocation / capacity)*100
-    td #{name}
-    td.hide-on-small-only: .progress: .determinate(style="width: "+ progress +"%")
-    td.storage #{allocation} / #{capacity}
-    td
-        a.waves-effect.waves-light.btn-small.vol-del-btn.red(onclick="open_detach_vol_modal('" + name + "')")
-            i.material-icons eject
-        a.waves-effect.waves-light.btn-small.vol-del-btn.grey.darken-4(onclick="open_delete_vol_modal('" + name + "')")
-            i.material-icons delete
+    -if(capacity >= 1)
+        -progress = (allocation / capacity)*100
+        td #{name}
+        td.hide-on-small-only: .progress: .determinate(style="width: "+ progress +"%")
+        td.storage #{allocation} / #{capacity}
+        td
+            a.waves-effect.waves-light.btn-small.vol-del-btn.red(onclick="open_detach_vol_modal('" + data.domain.name+ "', '" + name + "')")
+                i.material-icons eject
+            a.waves-effect.waves-light.btn-small.vol-del-btn.grey.darken-4(onclick="open_delete_vol_modal('" + data.domain.name + "', '" + name + "')")
+                i.material-icons delete
+    -else
+        td #{name}
+        td: p This volume disappear. Please remove it.
+        td.vol-storage #{capacity}
+        td
+            a.waves-effect.waves-light.btn-small.vol-del-btn.red(onclick="open_detach_vol_modal('" + data.domain.name + "', '" + name + "')")
+                i.material-icons eject
+            a.waves-effect.waves-light.btn-small.vol-del-btn.grey.darken-4(onclick="open_delete_vol_modal('" + data.domain.name + "', '" + name + "')")
+                i.material-icons delete
+
 
 
 block content
+
+    #modalDetachVol.modal
+        .modal-content
+            h4 Detach a Volume
+            .row
+                .col.s12
+                    p Are you sure you want to detach this volume?
+
+        .modal-footer
+            a#detachVolBtn.modalBtn.modal-action.modal-close.waves-effect.waves-red.btn.red(href="#!") Detach
+            a.modal-action.modal-close.waves-effect.waves-grey.btn.grey.lighten-1(href="#!") Cancel
+
+    #modalDeleteVol.modal
+        .modal-content
+            h4 Delete a Volume
+            .row
+                .col.s12
+                    p Are you sure you want to delete this volume?
+
+        .modal-footer
+            a#deleteVolBtn.modalBtn.modal-action.modal-close.waves-effect.waves-red.btn.red(href="#!") Delete
+            a.modal-action.modal-close.waves-effect.waves-grey.btn.grey.lighten-1(href="#!") Cancel
+
+    #modalAttachVol.modal
+        .modal-content
+            h4 Attach a Volume
+            .row
+                .input-field.col.s12
+                    select#vol_select(multiple)
+                        option(value="" disabled selected) Select the volumes you wanna attach
+                    label Volumes
+
+
+
+        .modal-footer
+            a#attachVolBtn.modalBtn.modal-action.modal-close.waves-effect.waves-red.btn.green(href="#!") Attach
+            a.modal-action.modal-close.waves-effect.waves-grey.btn.grey.lighten-1(href="#!") Cancel
+
     include header-nav
     include sidebar
 
@@ -45,7 +94,7 @@ block content
                             |  Volumes
                         .row
                         .divider
-                            a.btn-floating.halfway-fab.waves-effect.waves-light.green(onclick="open_delete_modal('" + name + "')")
+                            a.btn-floating.halfway-fab.waves-effect.waves-light.green(onclick="open_attach_vol_modal('" + data.domain.name + "')")
                                 i.material-icons link
                         table.centered
                             thead

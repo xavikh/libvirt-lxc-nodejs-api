@@ -19,10 +19,10 @@ function startCountdown(expirationTime) {
 }
 
 function updateCountdown() {
-    let timeCd = ($('#countdown').data("expirationTime") - Date.now())/1000;
+    let timeCd = ($('#countdown').data("expirationTime") - Date.now()) / 1000;
     let min_seg = '0:00';
     if (timeCd > 0) {
-        min_seg = Math.floor(timeCd / 60) + ':' +('' + parseInt(timeCd % 60)).padStart(2, '0');
+        min_seg = Math.floor(timeCd / 60) + ':' + ('' + parseInt(timeCd % 60)).padStart(2, '0');
     }
     $('#countdown').html(min_seg);
 
@@ -39,6 +39,8 @@ function verifyTelegramAccount() {
 function request_code() {
     request('GET', '/send-code', getToken(), null, (response) => {
         M.toast({html: response.message, classes: "green"});
+        let date = new Date(response.expireTime);
+        startCountdown(date.getTime());
     })
 }
 
@@ -49,6 +51,9 @@ function send_code() {
 
     request('POST', '/verify-code-web', getToken(), data, (response) => {
         M.toast({html: 'Logged', classes: "green"});
+        if (response.redirect) {
+            window.location.href = host + response.redirect;
+        }
     })
 }
 
@@ -129,8 +134,110 @@ function remove_vm() {
             M.toast({html: "VM deletion complete", classes: "green"});
             setTimeout(() => {
                 location.reload()
-            }, 3000);
+            }, 1000);
         });
     }
 }
+
+function deleteVolumeAttached(vm_name, vol_name) {
+    let data = {
+        volName: vol_name
+    };
+
+    M.toast({html: "Detaching " + vol_name + " volume...", classes: "amber"});
+    request('PUT', '/vm/' + vm_name + '/detach-disk', getToken(), data, (response) => {
+        M.toast({html: vol_name + " detaching complete", classes: "green"});
+
+        M.toast({html: "Deleting " + vol_name + " volume...", classes: "amber"});
+        request('DELETE', '/vol/' + vol_name, getToken(), null, (response) => {
+            M.toast({html: vol_name + " deletion complete", classes: "green"});
+            setTimeout(() => {
+                location.reload()
+            }, 2000);
+        });
+    });
+}
+
+function open_delete_vol_modal(vm_name, vol_name) {
+    let modal = $('#modalDeleteVol');
+    let delBtn = $('#deleteVolBtn');
+    delBtn.click(function () {
+        deleteVolumeAttached(vm_name, vol_name);
+    });
+
+    modal.modal('open');
+}
+
+function attachVol(vm_name, vol_name) {
+    let data = {
+        volName: vol_name
+    };
+    M.toast({html: "Attaching " + vol_name + " volume...", classes: "amber"});
+    request('PUT', '/vm/' + vm_name + '/attach-disk', getToken(), data, (response) => {
+        M.toast({html: vol_name + " attaching complete", classes: "green"});
+        setTimeout(() => {
+            location.reload()
+        }, 1000);
+    });
+}
+
+function detachVol(vm_name, vol_name) {
+    let data = {
+        volName: vol_name
+    };
+
+    M.toast({html: "Detaching " + vol_name + " volume...", classes: "amber"});
+    request('PUT', '/vm/' + vm_name + '/detach-disk', getToken(), data, (response) => {
+        M.toast({html: vol_name + " detaching complete", classes: "green"});
+        setTimeout(() => {
+            location.reload()
+        }, 1000);
+    });
+}
+
+function open_attach_vol_modal(vm_name) {
+    let modal = $('#modalAttachVol');
+    let attachBtn = $('#attachVolBtn');
+    let vol_select = $('#vol_select');
+    attachBtn.off("click");
+    attachBtn.click(function () {
+        console.log(vol_select.formSelect('getSelectedValues').length);
+        console.log(vol_select.formSelect('getSelectedValues')[0]);
+        if(vol_select.formSelect('getSelectedValues').length > 0) {
+            for (let select_vol in vol_select.formSelect('getSelectedValues')) {
+                setTimeout(() => {
+                    attachVol(vm_name, vol_select.formSelect('getSelectedValues')[select_vol]);
+                }, 2000 * select_vol);
+            }
+            setTimeout(() => {
+                location.reload()
+            }, 3000 * vol_select.formSelect('getSelectedValues').length);
+        } else {
+            M.toast({html: "Must select at least one volume", classes: "red"});
+        }
+    });
+    request('GET', '/vol/info', getToken(), null, (response) => {
+        for (let vol in response) {
+            vol_select.append("<option value=\"" + response[vol].name + "\"> " + response[vol].name + " (" + response[vol].allocation / 1048576 + "MB/" + response[vol].capacity / 1048576 + "MB)</option>>")
+        }
+
+        vol_select.prop('selectedIndex', 0);
+        vol_select.formSelect();
+        //console.log(vol_select.formSelect('getSelectedValues'));
+
+        modal.modal('open');
+    });
+}
+
+function open_detach_vol_modal(vm_name, vol_name) {
+    let modal = $('#modalDetachVol');
+    let detachVolBtn = $('#detachVolBtn');
+
+    detachVolBtn.off("click");
+    detachVolBtn.click(function () {
+        detachVol(vm_name, vol_name);
+    });
+    modal.modal('open');
+}
+
 

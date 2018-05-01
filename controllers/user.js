@@ -147,10 +147,11 @@ function loginWeb(req, res) {
                 });
                 user.password = undefined;
 
-                res.cookie('token', token.generate(user), { maxAge: 10800000, httpOnly: true });
-                //if (!user.telegramId) return res.redirect('/dashboard/vm');
+                res.cookie('token', token.generate(user), {maxAge: 10800000, httpOnly: true});
+                let redirect = '/code';
+                if (!user.telegramId) redirect = '/verify-telegram';
                 return res.status(200).send({
-                    redirect: '/verify-telegram'
+                    redirect: redirect
                 })
             })
         })
@@ -257,8 +258,10 @@ function verifyCodeWeb(req, res) {
                     });
                     user.telegramId = undefined;
 
-                    res.cookie('token', token.generate(user, true), { maxAge: 10800000, httpOnly: true });
-                    return res.status(200).send({})
+                    res.cookie('token', token.generate(user, true), {maxAge: 10800000, httpOnly: true});
+                    return res.status(200).send({
+                        redirect: '/dashboard'
+                    })
                 });
             }
         })
@@ -294,7 +297,8 @@ function sendCode(req, res) {
                 });
                 codes.sendCode(user.telegramId, code);
                 return res.status(200).send({
-                    message: "Code sent"
+                    message: "Code sent",
+                    expireTime: user.twoFactorCodeTimestamp
                 })
             });
 
@@ -444,6 +448,8 @@ function verifyEmail(req, res) {
             })
         })
 }
+
+
 
 module.exports = {
     signUp,

@@ -42,6 +42,15 @@ nav {
   margin-bottom: -2px;
 }
 
+.sidenav .user-view .logout-btn {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  padding: 5px;
+  font-size: 0.65em;
+  line-height: 1em;
+}
+
 .breadcrumb:first-child {
   margin-left: 20px;
 }
@@ -162,6 +171,10 @@ nav {
 
 .progress{
     margin-top: 1rem;
+}
+
+.vol-storage::after {
+  content: " MB";
 }
 
 .vol-alloc {
