@@ -1,10 +1,20 @@
 header
     nav
-        a.brand-logo.right.logo_name(href="#") CDWS
+        a.brand-logo.right.logo_name(href="#")= data.title
         a.sidenav-trigger.hide-on-large-only(href='#', data-target='slide-out', data-activates="slide-out")
             i.material-icons menu
         .nav-wrapper
             .col.s12
-                a.breadcrumb(href="/dashboard") Virtual machines
-                -if(data.domain && data.domain.name)
-                    a.breadcrumb(href="#!")= data.domain.name
+                case data.section
+                    when "vm"
+                        a.breadcrumb(href="/dashboard") Virtual machines
+                        -if(data.domain && data.domain.name)
+                            a.breadcrumb(href="#!")= data.domain.name
+                    when 'vol'
+                        a.breadcrumb(href="/dashboard") Volumes
+                    when 'images'
+                        a.breadcrumb(href="/dashboard") Images
+                    when 'stats'
+                        a.breadcrumb(href="/dashboard") Statistics
+                    default
+                        a.breadcrumb(href="/dashboard") Dashboard

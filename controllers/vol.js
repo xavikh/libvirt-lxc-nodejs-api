@@ -37,12 +37,6 @@ function getVolumeInfo(req, res) {
 function getVolumeList(req, res) {
     volumes_lvirt.getVolumeList((err, volumes) => {
         if(err) return setErrorRes(res, err);
-
-        let index = volumes.indexOf("root");
-        if (index !== -1) volumes.splice(index, 1);
-        index = volumes.indexOf("swap");
-        if (index !== -1) volumes.splice(index, 1);
-
         return res.status(200).send(volumes);
     })
 }

@@ -1,0 +1,22 @@
+extends layout
+
+block content
+    .login_bg
+        .row.v-align
+            .col.s12.m8.offset-m2.l4.offset-l4
+                form#loginForm.card.grey.darken-3.hoverable
+                    .card-content.white-text
+                        span.card-title.center Your code is:
+                        .section
+                            h3#code.center - - - - - -
+                            .row
+                            p.center Please go to Telegram a talk to '@CDWS_bot'
+                            .row
+                            p.center Your code will expire in :
+                            h4#countdown.center -:--
+                        .card-action.login_actions
+                            a.btn.signup_btn.amber.darken-3(href="#" onclick="verifyTelegramAccount()") Request new code
+    include main_scripts
+    script(src="/javascripts/api_calls/token_manager.js")
+    script(src="/javascripts/api_calls/req_config.js")
+    script(src="/javascripts/api_calls/api_req.js" onload="verifyTelegramAccount()")

@@ -17,6 +17,7 @@ function signUp(req, res) {
     const email = services.normEmail(req.body.email);
     const name = req.body.name;
     const password = req.body.password;
+    const avatar_image = req.body.avatar_image;
 
     if (!input.validName(name)) return res.status(400).send({
         status: 400,
@@ -47,6 +48,7 @@ function signUp(req, res) {
                     email: email,
                     name: name,
                     password: password,
+                    avatar_image: avatar_image,
                     status: "Created",
                     verifyEmailToken: token.toString('hex'),
                     verifyEmailExpires: expires
@@ -109,6 +111,51 @@ function login(req, res) {
         })
 }
 
+function loginWeb(req, res) {
+    const email = services.normEmail(req.body.email);
+    const password = req.body.password;
+
+    if (!input.validEmail(email)) return res.status(400).send({
+        status: 400,
+        message: "The 'email' isn't correct"
+    });
+    if (!input.validPassword(password)) return res.status(400).send({
+        status: 400,
+        message: "The 'password' isn't correct"
+    });
+
+    User.findOne({email: email})
+        .select('+password +telegramId ')
+        .exec((err, user) => {
+            if (err) return res.status(500).send({status: 500, message: "Internal server error"});
+            if (!user) return res.status(404).send({
+                status: 404,
+                message: "The combination of user and password received doesn't exist"
+            });
+
+            if (config.SEND_VERIFICATION_EMAIL)
+                if (user.status !== 'Verified') return res.status(401).send({
+                    status: 401,
+                    message: "The email needs to be verified"
+                });
+
+            bcrypt.compare(req.body.password, user.password, (err, equals) => {
+                if (err) return res.status(500).send({status: 500, message: "Internal server error"});
+                if (!equals) return res.status(404).send({
+                    status: 404,
+                    message: "The combination of user and password received doesn't exist"
+                });
+                user.password = undefined;
+
+                res.cookie('token', token.generate(user), { maxAge: 10800000, httpOnly: true });
+                //if (!user.telegramId) return res.redirect('/dashboard/vm');
+                return res.status(200).send({
+                    redirect: '/verify-telegram'
+                })
+            })
+        })
+}
+
 function verifyTelegramAccount(req, res) {
     User.findById(req.user)
         .select("+telegramId +verificationCode +verificationCodeTimestamp")
@@ -128,7 +175,7 @@ function verifyTelegramAccount(req, res) {
 
             let code = codes.generateCode();
             user.verificationCode = code;
-            user.verificationCodeTimestamp = Date.now() + config.CODE_EXP_TIME;
+            user.verificationCodeTimestamp = Date.now() + config.CODE_VERIFICATION_EXP_TIME;
             user.save((err) => {
                 if (err) return res.status(500).send({
                     status: 500,
@@ -136,7 +183,9 @@ function verifyTelegramAccount(req, res) {
                 });
                 return res.status(200).send({
                     status: 200,
-                    message: "Ok. Now go to your Telegram a talk to '@CDWS_bot'. Your code is: " + code
+                    code: code,
+                    expireTime: user.verificationCodeTimestamp,
+                    message: "Ok. Now go to your Telegram and talk to '@CDWS_bot'"
                 });
             });
         })
@@ -174,6 +223,42 @@ function verifyCode(req, res) {
                         token: token.generate(user, true),
                         user: user
                     })
+                });
+            }
+        })
+}
+
+function verifyCodeWeb(req, res) {
+    const code = req.body.code;
+
+    if (!input.validCode(code)) return res.status(400).send({message: "The 'code' field isn't correct or is missing"});
+
+    User.findById(req.user)
+        .select("+telegramId +twoFactorCode +twoFactorCodeTimestamp")
+        .exec((err, user) => {
+            if (err) return res.status(500).send({status: 500, message: "Internal server error"});
+            if (!user) return res.status(404).send({
+                status: 404,
+                message: "Some error occurred retrieving the user"
+            });
+            if (!user.telegramId || !user.twoFactorCode || !user.twoFactorCodeTimestamp) {
+                return res.status(401).send({status: 401, message: "Unauthorized"});
+            } else if (code !== user.twoFactorCode) {
+                return res.status(401).send({status: 401, message: "Unauthorized code"});
+            } else if (user.twoFactorCodeTimestamp.getTime() < Date.now()) {
+                return res.status(401).send({status: 401, message: "Expired code"});
+            } else {
+                user.twoFactorCode = undefined;
+                user.twoFactorCodeTimestamp = undefined;
+                user.save((err, user) => {
+                    if (err) return res.status(500).send({
+                        status: 500,
+                        message: "Internal server error"
+                    });
+                    user.telegramId = undefined;
+
+                    res.cookie('token', token.generate(user, true), { maxAge: 10800000, httpOnly: true });
+                    return res.status(200).send({})
                 });
             }
         })
@@ -363,9 +448,11 @@ function verifyEmail(req, res) {
 module.exports = {
     signUp,
     login,
+    loginWeb,
     sendCode,
     verifyTelegramAccount,
     verifyCode,
+    verifyCodeWeb,
     updateUserData,
     getUserData,
     getUser,

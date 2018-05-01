@@ -76,7 +76,7 @@ block content
                                 select
                                     option(value="" disabled selected) Choose a ISO to mount
                                     each iso in data.isos
-                                        option(value="1")= iso
+                                        option(value='"'+ data.isos +'"')= iso
                                 label Select a image and press Apply
                     .card-action
                         a.waves-effect.waves-green.btn(href="#!") Apply / Attach

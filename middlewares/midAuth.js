@@ -5,11 +5,15 @@ const User = require('../models/user');
 
 function isMidAuth(req, res, next) {
     const auth = req.headers.authorization;
-    if (!auth) {
-        return res.sendStatus(401);
-    }
+    const authCookie = req.cookies.token;
 
-    const tokenReq = auth.split(" ")[1];
+    let tokenReq;
+    if(auth)
+        tokenReq = auth.split(" ")[1];
+    else if(authCookie)
+        tokenReq = authCookie;
+    else
+        return res.sendStatus(401);
 
     token.decode(tokenReq)
         .then(response => {

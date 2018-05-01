@@ -48,6 +48,10 @@ function getVolumeList(next) {
 
         pool.getVolumes((err, volumes) => {
             if (err) return next(parseError(err));
+            let index = volumes.indexOf("root");
+            if (index !== -1) volumes.splice(index, 1);
+            index = volumes.indexOf("swap");
+            if (index !== -1) volumes.splice(index, 1);
             next(null, volumes);
         });
     });
@@ -57,6 +61,29 @@ function getVolInfo(volume, next) {
     volume.getInfo((err, info) => {
         if (err) return next(parseError(err));
         next(null, info);
+    });
+}
+
+function getVolumesInfoList(next) {
+    getVolumeList((err, vol_list) => {
+        let promises = vol_list.map((vol_name) => {
+            return new Promise((resolve, reject) => {
+                getVolumeByName(vol_name, (err, vol) => {
+                    if (err) reject(err);
+                    getVolInfo(vol, (err, vol_info) => {
+                        if (err) reject(err);
+                        vol_info.name = vol_name;
+                        resolve(vol_info);
+                    });
+                });
+            });
+        });
+
+        Promise.all(promises).then((info) => {
+            next(null, info)
+        }).catch((err) => {
+            next(err);
+        });
     });
 }
 
@@ -117,6 +144,7 @@ module.exports = {
     getVolumeByName,
     getVolumeList,
     getVolInfo,
+    getVolumesInfoList,
     populateVolumesInfo,
     removeVolume,
     cloneVolume

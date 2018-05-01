@@ -1,18 +1,19 @@
 'use strict';
 
-const moment = require('moment');
-
 const token = require('../services/token');
 const User = require('../models/user');
 
 function isAuth(req, res, next) {
     const auth = req.headers.authorization;
-    if (!auth) {
-        // return res.sendStatus(401);
-        return res.redirect('login');
-    }
+    const authCookie = req.cookies.token;
 
-    const tokenReq = auth.split(" ")[1];
+    let tokenReq;
+    if(auth)
+        tokenReq = auth.split(" ")[1];
+    else if(authCookie)
+        tokenReq = authCookie;
+    else
+        return res.sendStatus(401);
 
     token.decode(tokenReq)
         .then(response => {

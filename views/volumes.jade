@@ -1,0 +1,45 @@
+extends layout
+
+mixin vol(name, allocation, capacity)
+    -progress = (allocation / capacity)*100
+    td #{name}
+    td.hide-on-small-only: .progress: .determinate(style="width: "+ progress +"%")
+    td.storage #{allocation} / #{capacity}
+    td
+        a.waves-effect.waves-light.btn-small.vol-del-btn.amber(onclick="open_detach_vol_modal('" + name + "')")
+            i.material-icons content_copy
+        a.waves-effect.waves-light.btn-small.vol-del-btn.grey.darken-4(onclick="open_delete_vol_modal('" + name + "')")
+            i.material-icons delete
+
+
+block content
+    include header-nav
+
+    main
+        .fixed-action-btn
+            a.btn-floating.btn-large.green.modal-trigger(href="#modalCreateVm")
+                i.large.material-icons add
+
+        include sidebar
+
+        -var emptyList = false
+        .table-container
+            table.centered
+                thead
+                    tr
+                        th.vol-name Volume Name
+                        th.vol-bar.hide-on-small-only
+                        th.vol-alloc Allocated/Capacity
+                        th.vol-del Actions
+                tbody
+                    each vol in data.volumes
+                        tr: +vol(vol.name, vol.allocation / 1048576, vol.capacity / 1048576)
+
+        if emptyList
+            p.center Empty list
+
+    include main_scripts
+    script(src="/javascripts/initMaterialize.js")
+    script(src="/javascripts/api_calls/req_config.js")
+    script(src="/javascripts/api_calls/token_manager.js")
+    script(src="/javascripts/api_calls/api_req.js")

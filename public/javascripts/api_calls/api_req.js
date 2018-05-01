@@ -4,14 +4,35 @@ function login() {
         password: $('#pass').val()
     };
 
-    request('POST', '/login', null, data, (response) => {
-        if (response.token) {
-            cleanToken();
-            saveToken(response.token, false);
-            window.location.href = host + "/code";
-        } else {
-            M.toast({html: 'Some error ocurred :(', classes: "red"})
+    request('POST', '/login-web', null, data, (response) => {
+        M.toast({html: "Logged", classes: "green"});
+        if (response.redirect) {
+            window.location.href = host + response.redirect;
         }
+    })
+}
+
+function startCountdown(expirationTime) {
+    $('#countdown').data("expirationTime", expirationTime);
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+}
+
+function updateCountdown() {
+    let timeCd = ($('#countdown').data("expirationTime") - Date.now())/1000;
+    let min_seg = '0:00';
+    if (timeCd > 0) {
+        min_seg = Math.floor(timeCd / 60) + ':' +('' + parseInt(timeCd % 60)).padStart(2, '0');
+    }
+    $('#countdown').html(min_seg);
+
+}
+
+function verifyTelegramAccount() {
+    request('GET', '/verify-telegram-account', getToken(), null, (response) => {
+        $('#code').html(response.code);
+        let date = new Date(response.expireTime);
+        startCountdown(date.getTime());
     })
 }
 
@@ -26,14 +47,8 @@ function send_code() {
         code: $('#code').val()
     };
 
-    request('POST', '/verify-code', getToken(), data, (response) => {
-        if (response.token) {
-            cleanToken();
-            saveToken(response.token, false);
-            window.location.href = host + "/dashboard";
-        } else {
-            M.toast({html: 'Some error ocurred :(', classes: "red"})
-        }
+    request('POST', '/verify-code-web', getToken(), data, (response) => {
+        M.toast({html: 'Logged', classes: "green"});
     })
 }
 
@@ -41,11 +56,13 @@ function signup() {
     let data = {
         name: $('#name').val(),
         email: $('#email').val(),
-        password: $('#pass').val()
+        password: $('#pass').val(),
+        avatar_image: $('#avatar').val()
     };
 
     request('POST', '/signup', null, data, (response) => {
         M.toast({html: response.message, classes: "green"})
+        window.location.href = host + "/login";
     })
 }
 
@@ -66,7 +83,9 @@ function create_vm() {
     request('POST', '/vm', getToken(), data, (response) => {
         M.toast({html: "VM created", classes: "green"});
         $('#modalCreateVm').modal('close');
-        setTimeout(() => {location.reload()}, 1000);
+        setTimeout(() => {
+            location.reload()
+        }, 1000);
     })
 }
 
@@ -74,7 +93,9 @@ function change_vm_status(name, status) {
     M.toast({html: "Processing...", classes: "amber"});
     request('PUT', '/vm/' + name + '/' + status, getToken(), null, (response) => {
         M.toast({html: "Action completed", classes: "green"});
-        setTimeout(() => {location.reload()}, 1000);
+        setTimeout(() => {
+            location.reload()
+        }, 1000);
     })
 }
 
@@ -97,14 +118,18 @@ function remove_vm() {
             M.toast({html: "Deleteing " + name + " virtual machine...", classes: "amber"});
             request('DELETE', '/vm/' + name, getToken(), null, (response) => {
                 M.toast({html: "VM deletion complete", classes: "green"});
-                setTimeout(() => {location.reload()}, 5000);
+                setTimeout(() => {
+                    location.reload()
+                }, 5000);
             });
         });
     } else {
         M.toast({html: "Deleteing " + name + " virtual machine...", classes: "amber"});
         request('DELETE', '/vm/' + name, getToken(), null, (response) => {
             M.toast({html: "VM deletion complete", classes: "green"});
-            setTimeout(() => {location.reload()}, 3000);
+            setTimeout(() => {
+                location.reload()
+            }, 3000);
         });
     }
 }

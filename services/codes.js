@@ -35,8 +35,7 @@ function initTelegram() {
             .exec((err, user) => {
                 if (err) return bot.sendMessage(chatId, "Internal error");
                 if (!user || user.length < 1) return bot.sendMessage(chatId, "Doesn't exist a user with that email");
-                console.log(user);
-                if (user.telegramId) return bot.sendMessage(chatId, "TelegramId already assigned");
+                if (user.telegramId) return bot.sendMessage(chatId, "Telegram account already assigned");
                 if (!user.verificationCode || !user.verificationCodeTimestamp) return bot.sendMessage(chatId, "Unauthorized");
                 if (code !== user.verificationCode) return bot.sendMessage(chatId, "Invalid code");
 
@@ -49,7 +48,6 @@ function initTelegram() {
                     if(err) return bot.sendMessage(chatId, "A error occurred");
                     return bot.sendMessage(chatId, "Success");
                 })
-
             });
     });
 }

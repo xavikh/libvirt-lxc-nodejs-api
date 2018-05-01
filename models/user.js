@@ -8,6 +8,7 @@ const UserSchema = new Schema({
     email: {type: String, unique: true, lowercase: true, required: true},
     password: {type: String, select: false, required: true},
     name: {type: String, required: true},
+    avatar_image: {type: String},
 
     signUpDate: {type: Date, default: Date.now},
     lastAccess: Date,
