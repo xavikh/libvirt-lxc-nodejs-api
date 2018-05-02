@@ -158,7 +158,7 @@ function deleteVolumeAttached(vm_name, vol_name) {
     });
 }
 
-function open_delete_vol_modal(vm_name, vol_name) {
+function open_delete_vmvol_modal(vm_name, vol_name) {
     let modal = $('#modalDeleteVol');
     let delBtn = $('#deleteVolBtn');
     delBtn.click(function () {
@@ -265,6 +265,16 @@ function detachCdrom(vm_name) {
     });
 }
 
+function open_clone_vol_modal(vol_name) {
+    let modal = $('#modalCloneVol');
+    let cloneBtn = $('#cloneVolBtn');
+    cloneBtn.click(function () {
+        cloneVolume(vol_name);
+    });
+
+    modal.modal('open');
+}
+
 function cloneVolume(vol_name) {
     M.toast({
         html: "<span style='width: 150px;'>Cloning the volume</span></span><div class=\"progress\" style='width: 320px;'>\n" +
@@ -282,5 +292,51 @@ function cloneVolume(vol_name) {
 }
 
 function deleteVolume(vol_name) {
-    
+    M.toast({html: "Deleting " + vol_name + " volume...", classes: "amber"});
+    request('DELETE', '/vol/' + vol_name, getToken(), null, (response) => {
+        M.toast({html: vol_name + " deletion complete", classes: "green"});
+        setTimeout(() => {
+            location.reload()
+        }, 2000);
+    });
 }
+
+function open_delete_vol_modal(vol_name) {
+    let modal = $('#modalDeleteVol');
+    let delBtn = $('#deleteVolBtn');
+    delBtn.click(function () {
+        deleteVolume(vol_name);
+    });
+
+    modal.modal('open');
+}
+
+function createVolume(vol_name, vol_size) {
+    let data = {
+        name: vol_name,
+        size: vol_size
+    };
+    M.toast({html: "Creating " + vol_name + " volume...", classes: "amber"});
+    request('POST', '/vol/', getToken(), data, (response) => {
+        M.toast({html: vol_name + " created", classes: "green"});
+        setTimeout(() => {
+            location.reload()
+        }, 2000);
+    });
+}
+
+function open_create_vol_modal() {
+    let modal = $('#modalCreateVol');
+    let createBtn = $('#createVolBtn');
+
+    console.log("Cacaaaaaaaaaaaaa1");
+    createBtn.click(function () {
+        console.log("Cacaaaaaaaaaaaaa");
+        let vol_name = $('#volname').val()
+        let vol_size = $('#volsize').val()
+        createVolume(vol_name, vol_size);
+    });
+
+    modal.modal('open');
+}
+

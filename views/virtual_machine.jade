@@ -13,12 +13,12 @@ mixin vol(name, allocation, capacity)
                 i.material-icons delete
     -else
         td #{name}
-        td: p This volume disappear. Please remove it.
+        td: p This volume disappear. Please detach it.
         td.vol-storage #{capacity}
         td
             a.waves-effect.waves-light.btn-small.vol-del-btn.red(onclick="open_detach_vol_modal('" + data.domain.name + "', '" + name + "')")
                 i.material-icons eject
-            a.waves-effect.waves-light.btn-small.vol-del-btn.grey.darken-4(onclick="open_delete_vol_modal('" + data.domain.name + "', '" + name + "')")
+            a.waves-effect.waves-light.btn-small.vol-del-btn.grey.darken-4(onclick="open_delete_vmvol_modal('" + data.domain.name + "', '" + name + "')")
                 i.material-icons delete
 
 block content
@@ -32,7 +32,7 @@ block content
 
         .modal-footer
             a#detachVolBtn.modalBtn.modal-action.modal-close.waves-effect.waves-red.btn.red(href="#!") Detach
-            a.modal-action.modal-close.waves-effect.waves-grey.btn.grey.lighten-1(href="#!") Cancel
+            a.modal-action.modal-close.waves-effect.waves-grey.btn.grey(href="#!") Cancel
 
     #modalDeleteVol.modal
         .modal-content
@@ -43,7 +43,7 @@ block content
 
         .modal-footer
             a#deleteVolBtn.modalBtn.modal-action.modal-close.waves-effect.waves-red.btn.red(href="#!") Delete
-            a.modal-action.modal-close.waves-effect.waves-grey.btn.grey.lighten-1(href="#!") Cancel
+            a.modal-action.modal-close.waves-effect.waves-grey.btn.grey(href="#!") Cancel
 
     #modalAttachVol.modal
         .modal-content
@@ -58,7 +58,7 @@ block content
 
         .modal-footer
             a#attachVolBtn.modalBtn.modal-action.modal-close.waves-effect.waves-red.btn.green(href="#!") Attach
-            a.modal-action.modal-close.waves-effect.waves-grey.btn.grey.lighten-1(href="#!") Cancel
+            a.modal-action.modal-close.waves-effect.waves-grey.btn.grey(href="#!") Cancel
 
     include header-nav
     include sidebar

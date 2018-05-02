@@ -17,9 +17,8 @@ block content
                         a(href="#" style="margin: 0 15px") Forgot your password?
                     .card-action.login_actions
                         a.btn.signup_btn.amber.darken-3(href="/signup") Sign up
-                        a.btn.login_btn(onclick="login()") Login
-
+                        a#confirm.btn.login_btn(onclick="login()") Login
     include main_scripts
     script(src="/javascripts/api_calls/token_manager.js")
     script(src="/javascripts/api_calls/req_config.js")
-    script(src="/javascripts/api_calls/api_req.js")
+    script(src="/javascripts/api_calls/api_req.js" onload="$(\"#pass\").keyup(function(event) { if (event.keyCode === 13) { $(\"#confirm\").click() } });")

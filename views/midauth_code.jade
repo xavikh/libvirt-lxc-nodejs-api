@@ -16,9 +16,9 @@ block content
                             h4#countdown.center -:--
                     .card-action.login_actions
                         a.btn.signup_btn.amber.darken-3(href="#" onclick="request_code()") Re-send code
-                        a.btn.login_btn(onclick="send_code()") Confirm
+                        a#confirm.btn.login_btn(onclick="send_code()") Confirm
 
     include main_scripts
     script(src="/javascripts/api_calls/token_manager.js")
     script(src="/javascripts/api_calls/req_config.js")
-    script(src="/javascripts/api_calls/api_req.js" onload="request_code()")
+    script(src="/javascripts/api_calls/api_req.js" onload="$(\"#code\").keyup(function(event) { if (event.keyCode === 13) { $(\"#confirm\").click() } }); request_code(); ")
