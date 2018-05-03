@@ -1,20 +1,20 @@
 header
     nav
-        a.brand-logo.right.logo_name(href="#")= data.title
+        a.brand-logo.right.logo_name(href="#")= "0.5.0 [ALPHA] - " + data.title
         a.sidenav-trigger.hide-on-large-only(href='#', data-target='slide-out', data-activates="slide-out")
             i.material-icons menu
         .nav-wrapper
             .col.s12
                 case data.section
                     when "vm"
-                        a.breadcrumb(href="/dashboard") Virtual machines
+                        a.breadcrumb(href="/dashboard/vm") Virtual machines
                         -if(data.domain && data.domain.name)
                             a.breadcrumb(href="#!")= data.domain.name
                     when 'vol'
-                        a.breadcrumb(href="/dashboard") Volumes
+                        a.breadcrumb(href="/dashboard/vol") Volumes
                     when 'images'
-                        a.breadcrumb(href="/dashboard") Images
+                        a.breadcrumb(href="/dashboard/images") Images
                     when 'stats'
-                        a.breadcrumb(href="/dashboard") Statistics
+                        a.breadcrumb(href="/dashboard/stats") Statistics
                     default
                         a.breadcrumb(href="/dashboard") Dashboard

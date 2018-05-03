@@ -11,6 +11,7 @@ const web = require('./routes/public_web');
 const user = require('./routes/users');
 const vm = require('./routes/vm');
 const vol = require('./routes/vol');
+const iso = require('./routes/images');
 
 const codes = require("./services/codes");
 
@@ -39,6 +40,7 @@ app.use('/', index);
 app.use('/user', user);
 app.use('/vm', vm);
 app.use('/vol', vol);
+app.use('/iso', iso);
 
 codes.initTelegram();
 

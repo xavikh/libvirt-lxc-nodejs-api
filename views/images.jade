@@ -1,0 +1,96 @@
+extends layout
+
+mixin image(name, size, timestamp)
+    td #{name}
+    td.vol-storage #{size}
+    td #{timestamp}
+    td
+        a.waves-effect.waves-light.btn-small.vol-del-btn.grey.darken-4(onclick="open_delete_iso_modal('" + name + "')")
+            i.material-icons delete
+
+block content
+
+    #modalDeleteIso.modal
+        .modal-content
+            h4 Delete a Image
+            .row
+                .col.s12
+                    p Are you sure you want to delete this image?
+
+        .modal-footer
+            a#deleteIsoBtn.modalBtn.modal-action.modal-close.waves-effect.waves-red.btn.red(href="#!") Delete
+            a.modal-action.modal-close.waves-effect.waves-grey.btn.grey(href="#!") Cancel
+
+    #modalCreateIso.modal
+        .modal-content
+            h4 Create a Image
+            .row
+                .col.s12
+                    p Copy & paste a url to download a ISO image
+                    .input-field
+                        input#download_url.validate(type="text")
+                        label(for="download_url") URL
+
+
+        .modal-footer
+            a#createIsoBtn.modalBtn.modal-action.modal-close.waves-effect.waves-red.btn.green(href="#!") Download
+            a.modal-action.modal-close.waves-effect.waves-grey.btn.grey(href="#!") Cancel
+
+    include header-nav
+
+    main
+        .fixed-action-btn
+            a.btn-floating.btn-large.green.modal-trigger(onclick="create_download_modal()")
+                i.large.material-icons add
+
+        include sidebar
+
+        h3 Images
+
+        -var emptyList = false
+        .table-container
+            table.centered
+                thead
+                    tr
+                        th.iso-name-h Image Name
+                        th.iso-size-h Size
+                        th.vol-name Creation date
+                        th.vol-del Actions
+                tbody
+                    each iso in data.isos
+                        -creationTime = new Date(iso.creation)
+                        tr: +image(iso.filename, iso.size / 1048576, creationTime.toLocaleString('es-ES'))
+
+        if emptyList
+            p.center Empty list
+
+        .divider
+
+        h3 Downloads
+        -var emptyList = false
+        .table-container
+            table.centered
+                thead
+                    tr
+                        th.iso-name-h Image Name
+                        th.vol-bar.hide-on-small-only Progress
+                        th.iso-size-h Size
+                        th.iso-speed-h Speed
+                        th.iso-eta-h Remaining time
+                        th.iso-action-h Actions
+                tbody#iso-downloads
+
+        if emptyList
+            p.center Empty list
+
+        .row
+        .row
+        .row
+
+
+
+    include main_scripts
+    script(src="/javascripts/initMaterialize.js")
+    script(src="/javascripts/api_calls/req_config.js")
+    script(src="/javascripts/api_calls/token_manager.js")
+    script(src="/javascripts/api_calls/api_req.js" onload="refreshDownloads()")

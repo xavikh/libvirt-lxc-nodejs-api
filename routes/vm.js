@@ -12,7 +12,6 @@ router.post('/', vmCtrl.createDomain);
 router.get('/', vmCtrl.getDomainList);
 
 router.get('/info', vmCtrl.getDomainInfoList);
-router.get('/isos', vmCtrl.isoList);
 router.get('/:name', vmCtrl.getDomain);
 router.put('/:name', vmCtrl.editDomain);
 router.delete('/:name', vmCtrl.removeDomain);

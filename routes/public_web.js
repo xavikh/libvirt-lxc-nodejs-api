@@ -10,7 +10,7 @@ const setErrorRes = require('../controllers/wrappers/errorsLibvirt').setErrorRes
 
 const domains_lvirt = require('../controllers/wrappers/libvirtDomains_wrapper');
 const volumes_lvirt = require('../controllers/wrappers/libvirtVolumes_wrapper');
-const system = require('../controllers/wrappers/system_wrapper');
+const images = require('../controllers/wrappers/filesystem_wrapper');
 const User = require('../models/user');
 
 router.get('/signup', (req, res) => {
@@ -69,7 +69,7 @@ router.get('/dashboard/vm/:name', auth, (req, res) => {
             if (!user) return res.sendStatus(404);
             domains_lvirt.getDomainInfo(vm, (err, info) => {
                 if (err) return setErrorRes(res, err);
-                system.isoList((err, isos) => {
+                images.isoList((err, isos) => {
                     if (err) return setErrorRes(res, err);
                     let data = {
                         section: 'vm',
@@ -99,6 +99,26 @@ router.get('/dashboard/vol', auth, (req, res) => {
                     user: user
                 };
                 return res.render('volumes', {data: data});
+            });
+        });
+});
+
+
+router.get('/dashboard/images', auth, (req, res) => {
+    User.findById(req.user)
+        .select("-_id")
+        .exec((err, user) => {
+            if (err) return res.sendStatus(500);
+            if (!user) return res.sendStatus(404);
+            images.isoList((err, isos) => {
+                if (err) return setErrorRes(res, err);
+                let data = {
+                    section: 'images',
+                    title: "CDWS",
+                    isos: isos,
+                    user: user
+                };
+                return res.render('images', {data: data});
             });
         });
 });

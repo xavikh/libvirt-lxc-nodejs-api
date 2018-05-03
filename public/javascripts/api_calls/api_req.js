@@ -66,7 +66,7 @@ function signup() {
     };
 
     request('POST', '/signup', null, data, (response) => {
-        M.toast({html: response.message, classes: "green"})
+        M.toast({html: response.message, classes: "green"});
         window.location.href = host + "/login";
     })
 }
@@ -329,14 +329,144 @@ function open_create_vol_modal() {
     let modal = $('#modalCreateVol');
     let createBtn = $('#createVolBtn');
 
-    console.log("Cacaaaaaaaaaaaaa1");
     createBtn.click(function () {
-        console.log("Cacaaaaaaaaaaaaa");
-        let vol_name = $('#volname').val()
-        let vol_size = $('#volsize').val()
+        let vol_name = $('#volname').val();
+        let vol_size = $('#volsize').val();
         createVolume(vol_name, vol_size);
     });
 
     modal.modal('open');
 }
+
+function deleteIso(iso_name) {
+    let data = {
+        iso: iso_name
+    };
+    M.toast({html: "Deleting " + iso_name + " image...", classes: "amber"});
+    request('DELETE', '/iso/', getToken(), data, (response) => {
+        M.toast({html: iso_name + " deletion complete", classes: "green"});
+        setTimeout(() => {
+            location.reload()
+        }, 2000);
+    });
+}
+
+function open_delete_iso_modal(iso_name) {
+    let modal = $('#modalDeleteIso');
+    let delBtn = $('#deleteIsoBtn');
+    delBtn.click(function () {
+        deleteIso(iso_name);
+    });
+
+    modal.modal('open');
+}
+
+function hashCode(str) {
+    return str.split('').reduce((prevHash, currVal) =>
+        (((prevHash << 5) - prevHash) + currVal.charCodeAt(0)) | 0, 0) + 2147483647;
+}
+
+function refreshDownloads() {
+    let table = $("#iso-downloads");
+    //table.empty();
+    request('GET', '/iso/download/info', getToken(), null, (response) => {
+
+        let resHashedIs = [];
+        let domHashedIds = [];
+
+        for (let key in response) {
+            resHashedIs.push(hashCode(key) + '');
+        }
+
+        let isos_rows = $("#iso-downloads > *");
+        for (let n = 0; n < isos_rows.length; n++) {
+            domHashedIds.push(isos_rows.get(n).id);
+        }
+
+        let differences = domHashedIds.filter(x => !resHashedIs.includes(x));
+
+        differences.map((id) => {
+            let elem = $("#"+id);
+            elem.empty();
+            elem.remove();
+        });
+
+        if (Object.keys(response).length > 0) {
+            for (let key in response) {
+                let hashkey = hashCode(key);
+                let table_row = $("#" + hashkey);
+                if (!table_row.length) {
+                    table.append("<tr id='" + hashkey + "'>" +
+                        "<td class='iso-name'>" + key + "</td>" +
+                        "<td class='hide-on-small-only'>" +
+                        "   <div class='progress'>" +
+                        "       <div class='determinate' style='width: " + response[key].percent * 100 + "%'></div>" +
+                        "   </div>" +
+                        "</td>" +
+                        "<td class='iso-size'>" + parseInt(response[key].size.total / 1048576) + "</td>" +
+                        "<td class='iso-speed'>" + parseInt(response[key].speed / 1048576) + "</td>" +
+                        "<td class='iso-eta'>" + parseInt(response[key].time.remaining) + "</td>" +
+                        "<td class='iso-action'>" +
+                        "   <a class='waves-effect waves-light btn-small vol-del-btn red' onclick=\"stopDownload('" + key + "')\">" +
+                        "       <i class='material-icons'>stop</i>" +
+                        "   </a>" +
+                        "</td>" +
+                        "</tr>")
+                } else {
+                    let progress = $('#' + hashkey + ' .determinate');
+                    progress.width((response[key].percent * 100) + "%");
+                    let speed = $('#' + hashkey + ' .iso-speed');
+                    speed.text(parseInt(response[key].speed / 1048576));
+                    let eta = $('#' + hashkey + ' .iso-eta');
+                    eta.text(parseInt(response[key].time.remaining));
+                }
+            }
+            setTimeout(() => {
+                refreshDownloads();
+            }, 1000);
+        }
+    });
+}
+
+function stopDownload(filename) {
+    let data = {
+        filename: filename
+    };
+    M.toast({html: "Stopping " + filename + " download...", classes: "amber"});
+    request('PUT', '/iso/download/stop', getToken(), data, (response) => {
+        M.toast({html: filename + " download stopped", classes: "green"});
+        setTimeout(() => {
+            location.reload()
+        }, 2000);
+    });
+}
+
+function createDownload() {
+    let download_url = $('#download_url').val();
+    let data = {
+        url: download_url
+    };
+    M.toast({html: "Starting download...", classes: "amber"});
+    request('POST', '/iso/download', getToken(), data, (response) => {
+        M.toast({html: response.message, classes: "green"});
+        setTimeout(() => {
+            location.reload()
+        }, 2000);
+    });
+    setTimeout(() => {
+        location.reload()
+    }, 2000);
+}
+
+function create_download_modal(){
+    let modal = $('#modalCreateIso');
+    let createBtn = $('#createIsoBtn');
+    createBtn.click(function () {
+        createDownload();
+    });
+
+    modal.modal('open');
+}
+
+
 

@@ -82,7 +82,7 @@ block content
                                 h5 RAM: #{data.domain.memory / 1048576} GB
                             .col.s4.center-align.darken-1.vm-spec
                                 i.material-icons.medium.blue-grey-text.text-darken-4 slow_motion_video
-                                h5 CPU TIME #{data.domain.cpuTime }%
+                                h5 CPU TIME #{data.domain.cpuTime}%
         .row
             .col.s12
                 .card.grey.lighten-4.z-depth-2
@@ -123,7 +123,7 @@ block content
                                 select#iso_select
                                     option(value="" disabled selected) Choose a ISO to mount
                                     each iso in data.isos
-                                        option(value= iso)= iso
+                                        option(value= iso.filename)= iso.filename
                                 label Select a image and press Apply
                     .card-action
                         a.waves-effect.waves-green.btn(onclick="attachCdrom('"+ data.domain.name +"')") Apply / Attach

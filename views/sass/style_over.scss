@@ -205,3 +205,25 @@ nav {
 #modalCloneVol {
   width: 400px;
 }
+
+
+
+.iso-name-h {
+  width: 25%;
+}
+
+.iso-size-h, .iso-speed-h, .iso-eta-h, .iso-action-h {
+  width: 5%;
+}
+
+.iso-size:after {
+  content: " MB";
+}
+
+.iso-speed:after {
+  content: " MB/s";
+}
+
+.iso-eta:after {
+  content: " s";
+}
