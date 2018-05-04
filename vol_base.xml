@@ -1,6 +1,6 @@
 <volume>
     <name>{{name}}</name>
-    <allocation>0</allocation>
+    <allocation unit="G">{{size}}</allocation>
     <capacity unit="G">{{size}}</capacity>
     <target>
         <path>/dev/centos/{{name}}</path>
