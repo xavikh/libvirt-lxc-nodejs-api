@@ -158,7 +158,11 @@ function attachCdrom(vm, iso, next) {
             };
             modelToXML(cdrom, 'device_base.xml', (err, cdxml) => {
                 xml = xml.replace("<type arch='x86_64' machine='pc-i440fx-rhel7.0.0'>hvm<\/type>", "$&\n<boot dev='cdrom'/>");
-                xml = xml.replace("</disk>", "$&\n" + cdxml);
+                if(xml.search("</disk>") !== -1) {
+                    xml = xml.replace("</disk>", "$&\n" + cdxml);
+                } else {
+                    xml = xml.replace("</emulator>", "$&\n" + cdxml);
+                }
                 lvirt.hp.defineDomain(xml, (err, domain) => {
                     if (err) return next(parseError(err));
                     next(null, domain !== undefined);
@@ -213,8 +217,11 @@ function attachDisk(vm, volPath, next) {
             };
             modelToXML(disk, 'disk_base.xml', (err, diskxml) => {
                 if (err) return next(err);
-                xml = xml.replace("</disk>", "$&\n" + diskxml);
-
+                if(xml.search("</disk>") !== -1) {
+                    xml = xml.replace("</disk>", "$&\n" + diskxml);
+                } else {
+                    xml = xml.replace("</emulator>", "$&\n" + diskxml);
+                }
                 lvirt.hp.defineDomain(xml, (err, domain) => {
                     if (err) return next(parseError(err));
                     next(null, domain !== undefined);

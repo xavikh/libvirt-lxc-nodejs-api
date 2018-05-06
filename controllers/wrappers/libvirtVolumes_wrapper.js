@@ -142,7 +142,7 @@ function cloneVolume(vol, cloneVol, next) {
             let xmlClone = "<volume type=\'block\'><name>" + cloneVol.name + "</name>" + "</volume>";
 
             pool.cloneVolume(volume, xmlClone, (err, cloneVolume) => {
-                if (err) return next(err);
+                if (err) return next(parseError(err));
                 next(null, cloneVolume);
             });
         });
