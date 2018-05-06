@@ -283,6 +283,23 @@ function removeDomain(vm, next) {
     });
 }
 
+function getDomainSpicePort(vm, next) {
+    getDomainByName(vm.name, (err, domain) => {
+        if (err) return next(err);
+        domain.toXml((err, xml) => {
+            if (err) return next(err);
+
+            let regex = /<graphics type='spice' port='([0-9]+)'/g;
+            let match = regex.exec(xml);
+
+            if (match)
+                return next(null, match[1]);
+            else
+                return next(null, undefined);
+        });
+    })
+}
+
 module.exports = {
     defineDomain,
     getDomainByName,
@@ -297,5 +314,6 @@ module.exports = {
     attachDisk,
     detachDisk,
     attachDeviceTest,
-    removeDomain
+    removeDomain,
+    getDomainSpicePort
 };

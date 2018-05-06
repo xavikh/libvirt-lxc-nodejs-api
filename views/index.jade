@@ -23,6 +23,8 @@ mixin vm(name, vcpu, ram, allocation, capacity, status)
             i.material-icons stop
         a.waves-effect.waves-light.btn-small.red(onclick="change_vm_status('" + name + "', 'force-shutdown')")
             i.material-icons power
+        a.waves-effect.waves-light.btn-small.pink.darken-1(onclick="open_console('" + name + "')")
+            i.material-icons airplay
         a.waves-effect.waves-light.btn-small.grey.darken-4(onclick="open_delete_modal('" + name + "')")
             i.material-icons delete
 

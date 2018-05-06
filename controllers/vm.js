@@ -1,8 +1,13 @@
+'use strict';
+const crypto = require('crypto');
+
 const setErrorRes = require('./wrappers/errorsLibvirt').setErrorRes;
 const parseError = require('./wrappers/errorsLibvirt').parseError;
 
 const domains_lvirt = require('../controllers/wrappers/libvirtDomains_wrapper');
 const volumes_lvirt = require('../controllers/wrappers/libvirtVolumes_wrapper');
+
+const websokify = require('../websockify');
 
 function createDomain(req, res) {
     const name = req.body.name;
@@ -316,6 +321,19 @@ function statusDomain(req, res) {
     })
 }
 
+// /vm/:name/console
+function getConsoleSession(req, res) {
+    let vm_name = req.params.name;
+    let vm = {
+        name: vm_name
+    };
+    domains_lvirt.getDomainSpicePort(vm, (err, port) => {
+        let token = crypto.randomBytes(10).toString('hex');
+        websokify.addTokenVar(token, "localhost", port);
+        res.status(200).send({token: token});
+    })
+}
+
 
 module.exports = {
     createDomain,
@@ -332,5 +350,6 @@ module.exports = {
     attachDeviceTest,
     getMountedVolumes,
     statusDomain,
-    getDomainInfo
+    getDomainInfo,
+    getConsoleSession
 };

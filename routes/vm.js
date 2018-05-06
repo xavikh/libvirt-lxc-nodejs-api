@@ -21,6 +21,7 @@ router.put('/:name/attach-disk', vmCtrl.attachDisk);
 router.put('/:name/detach-disk', vmCtrl.detachDisk);
 router.get('/:name/volumes', vmCtrl.getMountedVolumes);
 router.get('/:name/info', vmCtrl.getDomainInfo);
+router.get('/:name/console', vmCtrl.getConsoleSession);
 router.put('/:name/:status', vmCtrl.statusDomain);
 
 module.exports = router;
