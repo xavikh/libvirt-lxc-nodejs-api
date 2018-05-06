@@ -386,7 +386,7 @@ function refreshDownloads() {
         let differences = domHashedIds.filter(x => !resHashedIs.includes(x));
 
         differences.map((id) => {
-            let elem = $("#"+id);
+            let elem = $("#" + id);
             elem.empty();
             elem.remove();
         });
@@ -458,7 +458,7 @@ function createDownload() {
     }, 2000);
 }
 
-function create_download_modal(){
+function create_download_modal() {
     let modal = $('#modalCreateIso');
     let createBtn = $('#createIsoBtn');
     createBtn.click(function () {
@@ -468,5 +468,11 @@ function create_download_modal(){
     modal.modal('open');
 }
 
-
+function open_console(vm_name) {
+    request('GET', '/vm/' + vm_name + '/console', getToken(), null, (response) => {
+        let strWindowFeatures = "location=no,height=768,width=1020,left=10,top=10,scrollbars=yes,status=no,menubar=no,titlebar=no,toolbar=no";
+        let URL = "/console?token=" + response.token;
+        let win = window.open(URL, "_blank", strWindowFeatures);
+    });
+}
 
