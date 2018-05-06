@@ -123,4 +123,10 @@ router.get('/dashboard/images', auth, (req, res) => {
         });
 });
 
+router.get('/console', auth, (req, res) => {
+    let data = {
+    };
+    return res.render('console', {data: data});
+});
+
 module.exports = router;
