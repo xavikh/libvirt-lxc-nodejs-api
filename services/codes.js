@@ -1,6 +1,5 @@
 'use strict';
 
-const crypto = require('crypto');
 const TelegramBot = require('node-telegram-bot-api');
 const moment = require('moment');
 const config = require("../config");

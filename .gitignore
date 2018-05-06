@@ -1,6 +1,11 @@
-build
-.DS_Store
 *.sublime-*
-node_modules
+.DS_Store
+.sh
+.txt
 /.idea/
+build
 config.js
+lib/
+node_modules
+src/
+
