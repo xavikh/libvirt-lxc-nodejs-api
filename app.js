@@ -7,7 +7,7 @@ const bodyParser = require('body-parser');
 const sassMiddleware = require('node-sass-middleware');
 
 const websokify = require('./websockify');
-
+const network = require('./services/network');
 const codes = require("./services/codes");
 const index = require('./routes/index');
 const web = require('./routes/public_web');
@@ -16,9 +16,12 @@ const vm = require('./routes/vm');
 const vol = require('./routes/vol');
 const iso = require('./routes/images');
 
+codes.initTelegram();
+websokify.init_ws("", 3001, null, null);
+network.startContinousIpScan();
+
 let app = express();
 
-// view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
@@ -42,9 +45,6 @@ app.use('/user', user);
 app.use('/vm', vm);
 app.use('/vol', vol);
 app.use('/iso', iso);
-
-codes.initTelegram();
-websokify.init_ws("", 3001, null, null);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

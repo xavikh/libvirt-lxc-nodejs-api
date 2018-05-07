@@ -7,6 +7,7 @@ const parseError = require('./wrappers/errorsLibvirt').parseError;
 const domains_lvirt = require('../controllers/wrappers/libvirtDomains_wrapper');
 const volumes_lvirt = require('../controllers/wrappers/libvirtVolumes_wrapper');
 
+const network = require('../services/network');
 const websokify = require('../websockify');
 
 function createDomain(req, res) {
@@ -22,25 +23,31 @@ function createDomain(req, res) {
         "name": name,
         "vcpu": vcpu,
         "ram": ram, //MiB
-        "storagePath": "/dev/centos/" + req.body.name
+        "storagePath": "/dev/centos/" + req.body.name,
+        "mac": network.randomMAC()
     };
     let vol = {
         "name": vm.name,
         "size": volumeSize
     };
+    console.log("MAC: " + vm.mac);
 
     domains_lvirt.defineDomain(vm, (err, success) => {
         if (err) return setErrorRes(res, err);
-        if (!volume || volume === name) {
-            volumes_lvirt.createVolume(vol, (err, success) => {
-                if (err) return setErrorRes(res, err);
-                return res.status(200).send(success);
-            });
+        if (success) {
+            if (!volume || volume === name) {
+                volumes_lvirt.createVolume(vol, (err, success) => {
+                    if (err) return setErrorRes(res, err);
+                    return res.status(200).send(success);
+                });
+            } else {
+                volumes_lvirt.cloneVolume(clone, vol, (err, success) => {
+                    if (err) return setErrorRes(res, err);
+                    return res.status(200).send(success);
+                });
+            }
         } else {
-            volumes_lvirt.cloneVolume(clone, vol, (err, success) => {
-                if (err) return setErrorRes(res, err);
-                return res.status(200).send(success);
-            });
+            return setErrorRes(res, {code: 500, message: "Some error occurred"});
         }
     });
 }
@@ -278,6 +285,7 @@ function statusDomain(req, res) {
             case "start":
                 domain.start((err, success) => {
                     if (err) return setErrorRes(res, parseError(err));
+                    setTimeout(network.ipMacAnalysis, 5000);
                     if (success)
                         return res.status(200).send({message: success});
                     else
@@ -305,6 +313,7 @@ function statusDomain(req, res) {
             case "reboot":
                 domain.reboot((err, success) => {
                     if (err) return setErrorRes(res, parseError(err));
+                    setTimeout(network.ipMacAnalysis, 5000);
                     if (success)
                         return res.status(200).send({message: success});
                     else
@@ -314,14 +323,13 @@ function statusDomain(req, res) {
             default:
                 res.status(400).send({
                     code: 400,
-                    message: "The state " + status + " doesn't exist. Choose one of this: 'start', 'reboot' and 'shutdown'"
+                    message: "The state " + status + " doesn't exist. Choose one of this: 'start', 'reboot', 'shutdown' and 'force-shutdown'"
                 });
                 break;
         }
     })
 }
 
-// /vm/:name/console
 function getConsoleSession(req, res) {
     let vm_name = req.params.name;
     let vm = {
@@ -333,7 +341,6 @@ function getConsoleSession(req, res) {
         res.status(200).send({token: token});
     })
 }
-
 
 module.exports = {
     createDomain,

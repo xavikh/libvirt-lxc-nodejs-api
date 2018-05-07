@@ -53,7 +53,7 @@
             <address type='pci' domain='0x0000' bus='0x00' slot='0x06' function='0x0'/>
         </controller>
         <interface type='bridge'>
-            <mac address='52:54:00:1e:2b:74'/>
+            <mac address='{{mac}}'/>
             <source bridge='br0'/>
             <model type='virtio'/>
             <address type='pci' domain='0x0000' bus='0x00' slot='0x03' function='0x0'/>

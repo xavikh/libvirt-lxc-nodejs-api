@@ -6,6 +6,7 @@ const parseError = require('./errorsLibvirt').parseError;
 
 const lvirt = require('./libvirt_wrapper');
 const volumes_lvirt = require('./libvirtVolumes_wrapper');
+const network = require('../../services/network');
 
 function defineDomain(vm, next) {
     lvirt.connect((err) => {
@@ -104,7 +105,13 @@ function getDomainInfo(vm, next) {
                     volumes_lvirt.populateVolumesInfo(info, (err, popInfo) => {
                         if (err) next(err);
                         info.volumes = popInfo;
-                        next(null, info);
+                        getDomainMac(vm, (err, mac) => {
+                            info.mac = mac;
+                            let ip_mac = network.getIpForMac(mac);
+                            if (ip_mac)
+                                info.ip = ip_mac.ip;
+                            next(null, info);
+                        });
                     });
                 });
             });
@@ -290,6 +297,23 @@ function getDomainSpicePort(vm, next) {
             if (err) return next(err);
 
             let regex = /<graphics type='spice' port='([0-9]+)'/g;
+            let match = regex.exec(xml);
+
+            if (match)
+                return next(null, match[1]);
+            else
+                return next(null, undefined);
+        });
+    })
+}
+
+function getDomainMac(vm, next) {
+    getDomainByName(vm.name, (err, domain) => {
+        if (err) return next(err);
+        domain.toXml((err, xml) => {
+            if (err) return next(err);
+
+            let regex = /<mac address='([0-9a-f:]+)'/g;
             let match = regex.exec(xml);
 
             if (match)

@@ -258,7 +258,10 @@ function verifyCodeWeb(req, res) {
                     });
                     user.telegramId = undefined;
 
-                    res.cookie('token', token.generate(user, true), {maxAge: 10800000, httpOnly: true});
+                    res.cookie('token', token.generate(user, true), {
+                        maxAge: config.EXP_TOKEN * 3600000,
+                        httpOnly: true
+                    });
                     return res.status(200).send({
                         redirect: '/dashboard'
                     })
@@ -268,7 +271,6 @@ function verifyCodeWeb(req, res) {
 }
 
 function sendCode(req, res) {
-
     User.findById(req.user)
         .select("+telegramId")
         .exec((err, user) => {
