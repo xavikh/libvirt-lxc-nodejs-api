@@ -3,7 +3,7 @@ extends layout
 mixin vol(name, allocation, capacity)
     -progress = (allocation / capacity)*100
     td #{name}
-    td.hide-on-small-only: .progress: .determinate(style="width: "+ progress +"%")
+    td.hide-on-small-only: .progress: .determinate(style="width: " + progress + "%")
     td.vol-storage #{allocation} / #{capacity}
     td
         a.waves-effect.waves-light.btn-small.vol-del-btn.amber(onclick="open_clone_vol_modal('" + name + "')")
