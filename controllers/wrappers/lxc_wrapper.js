@@ -35,11 +35,11 @@ module.exports = function (configVar) {
             command: runCommand.slice(0, 1)[0],
             args: runCommand.slice(1),
             cbStdout: function (data) {
-                console.log('' + data);
+                console.log('OutLog: ' + data);
                 output += data;
             },
             cbStderr: function (data) {
-                console.log('' + data);
+                console.log('ErrLog' + data);
                 output += data;
                 errors += data;
             },
@@ -197,13 +197,13 @@ module.exports = function (configVar) {
                             containers.push({
                                 "name": vals[0],
                                 "state": vals[1],
-                                "ipv4": vals[2] === '-' ? null : vals[2],
-                                "ipv6": vals[3] === '-' ? null : vals[3],
-                                "autostart": vals[4] === '-' ? null : vals[4],
-                                "pid": vals[5] === '-' ? null : vals[5],
-                                "memory": vals[6] === '-' ? null : vals[6],
-                                "ram": vals[7] === '-' ? null : vals[7],
-                                "swap": vals[8] === '-' ? null : vals[8],
+                                "ipv4": vals[2] === '-' ? undefined : vals[2],
+                                "ipv6": vals[3] === '-' ? undefined : vals[3],
+                                "autostart": vals[4] === '-' ? undefined : vals[4],
+                                "pid": vals[5] === '-' ? undefined : vals[5],
+                                "memory": vals[6] === '-' ? undefined : vals[6],
+                                "ram": vals[7] === '-' ? undefined : vals[7],
+                                "swap": vals[8] === '-' ? undefined : vals[8],
                             });
                         }
                     }
@@ -227,6 +227,17 @@ module.exports = function (configVar) {
                 return next(null, false);
             }
         });
+    });
+
+    obj.getInfo = promisify(function (name, next) {
+        obj.list().then((list) => {
+            let ct = list.filter((ct) => {
+                return ct.name === name;
+            })[0];
+            next(null, ct);
+        }).catch((err) => {
+            next(err, undefined);
+        })
     });
 
     return obj;

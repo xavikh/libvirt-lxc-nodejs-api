@@ -12,6 +12,7 @@ const index = require('./routes/index');
 const web = require('./routes/public_web');
 const user = require('./routes/users');
 const vm = require('./routes/vm');
+const ct = require('./routes/ct');
 const vol = require('./routes/vol');
 const iso = require('./routes/images');
 
@@ -42,6 +43,7 @@ app.use('/', web);
 app.use('/', index);
 app.use('/user', user);
 app.use('/vm', vm);
+app.use('/ct', ct);
 app.use('/vol', vol);
 app.use('/iso', iso);
 
