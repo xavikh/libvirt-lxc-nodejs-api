@@ -4,10 +4,10 @@ ul#slide-out.sidenav.sidenav-fixed
             img(src='/images/bg.jpg')
         a.btn-small.waves-light.logout-btn.orange(href='/logout') Log out
         a.non-clickable(href='#user')
-        -if(!data.user.avatar_image)
-        img.circle(src='/images/user_profile_photo.jpg')
-        -else
-        img.circle(src= "'" + data.user.avatar_image + "'" )
+        if(!data.user.avatar_image)
+            img.circle(src='/images/user_profile_photo.jpg')
+        else
+            img.circle(src= "'" + data.user.avatar_image + "'" )
         a.non-clickable(href='#name')
             span.white-text.name= data.user.name
         a.non-clickable(href='#email')
