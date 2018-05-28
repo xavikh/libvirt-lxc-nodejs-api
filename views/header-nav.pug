@@ -8,8 +8,8 @@ header
                 case data.section
                     when "vm"
                         a.breadcrumb(href="/dashboard/vm") Virtual machines
-                        -if(data.domain && data.domain.name)
-                        a.breadcrumb(href="#!")= data.domain.name
+                        if(data.domain && data.domain.name)
+                            a.breadcrumb(href="#!")= data.domain.name
                     when 'vol'
                         a.breadcrumb(href="/dashboard/vol") Volumes
                     when 'images'
