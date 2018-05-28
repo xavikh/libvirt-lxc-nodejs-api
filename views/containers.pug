@@ -1,0 +1,69 @@
+extends layout
+
+mixin ct(name, ram, swap, status)
+    td.name(onclick="location.href = '/dashboard/ct/" + name + "';") #{name}
+    td.ram(onclick="location.href = '/dashboard/ct/" + name + "';") #{ram}
+    td.storage(onclick="location.href = '/dashboard/ct/" + name + "';") #{swap}
+    td.status(onclick="location.href = '/dashboard/ct/" + name + "';")
+        case status
+            when "RUNNING"
+                a.btn-flat.green.non-clickable #{status}
+            when "STOPPED"
+                a.btn-flat.red.non-clickable #{status}
+            when "FROZEN"
+                a.btn-flat.gray.non-clickable #{status}
+            default
+                a.btn-flat.orange.non-clickable #{status}
+
+    td.action
+        a.waves-effect.waves-light.btn-small.light-blue(onclick="change_vm_status('" + name + "', 'start')")
+            i.material-icons play_arrow
+        a.waves-effect.waves-light.btn-small.amber(onclick="change_vm_status('" + name + "', 'reboot')")
+            i.material-icons replay
+        a.waves-effect.waves-light.btn-small.orange(onclick="change_vm_status('" + name + "', 'shutdown')")
+            i.material-icons stop
+        a.waves-effect.waves-light.btn-small.red(onclick="change_vm_status('" + name + "', 'force-shutdown')")
+            i.material-icons power
+        a.waves-effect.waves-light.btn-small.pink.darken-1(onclick="open_console('" + name + "')")
+            i.material-icons airplay <!--open_in_browser personal_video open_in_new picture_in_picture??-->
+        a.waves-effect.waves-light.btn-small.grey.darken-4(onclick="open_delete_modal('" + name + "')")
+            i.material-icons delete
+
+block content
+
+    include header-nav
+
+    main
+        .fixed-action-btn
+            a.btn-floating.btn-large.green.modal-trigger(href="#modalCreateVm")
+                i.large.material-icons add
+            ul
+                li: a.btn-floating.yellow.darken-1.modal-trigger(href="#modalCreateVm"): i.material-icons content_copy
+
+        //-include sidebar
+
+        -var emptyList = false
+        .table-container
+            table.centered.highlight
+                thead
+                    tr
+                        th Name
+                        th Ram
+                        th Swap
+                        th Status
+                        th Actions
+                tbody
+                    if (!data.containers || data.containers.length < 1)
+                        -emptyList = true
+                    else
+                        each ct in data.containers
+                            tr: +ct(ct.name, ct.ram / 1048576, ct.swap / 1048576, ct.state)
+
+        if emptyList
+            p.center Empty list
+
+    include main_scripts
+    script(src="/javascripts/initMaterialize.js")
+    script(src="/javascripts/api_calls/req_config.js")
+    script(src="/javascripts/api_calls/token_manager.js")
+    script(src="/javascripts/api_calls/api_req.js")

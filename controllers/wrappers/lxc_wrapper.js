@@ -201,9 +201,9 @@ module.exports = function (configVar) {
                                 "ipv6": vals[3] === '-' ? undefined : vals[3],
                                 "autostart": vals[4] === '-' ? undefined : vals[4],
                                 "pid": vals[5] === '-' ? undefined : vals[5],
-                                "memory": vals[6] === '-' ? undefined : vals[6],
-                                "ram": vals[7] === '-' ? undefined : vals[7],
-                                "swap": vals[8] === '-' ? undefined : vals[8],
+                                "memory": vals[6] === '-' ? 0 : parseFloat(vals[6]),
+                                "ram": vals[7] === '-' ? 0 : parseFloat(vals[7]),
+                                "swap": vals[8] === '-' ? 0 : parseFloat(vals[8]),
                             });
                         }
                     }

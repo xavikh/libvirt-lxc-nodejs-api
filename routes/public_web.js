@@ -11,6 +11,7 @@ const setErrorRes = require('../controllers/wrappers/errorsLibvirt').setErrorRes
 const domains_lvirt = require('../controllers/wrappers/libvirtDomains_wrapper');
 const volumes_lvirt = require('../controllers/wrappers/libvirtVolumes_wrapper');
 const images = require('../controllers/wrappers/filesystem_wrapper');
+const lxc = require('../controllers/wrappers/lxc_wrapper')();
 const User = require('../models/user');
 
 router.get('/signup', (req, res) => {
@@ -55,7 +56,6 @@ router.get('/dashboard/vm', auth, (req, res) => {
                 return res.render('index', {data: data});
             });
         });
-
 });
 
 router.get('/dashboard/vm/:name', auth, (req, res) => {
@@ -119,6 +119,27 @@ router.get('/dashboard/images', auth, (req, res) => {
                     user: user
                 };
                 return res.render('images', {data: data});
+            });
+        });
+});
+
+router.get('/dashboard/ct', auth, (req, res) => {
+    User.findById(req.user)
+        .select("-_id")
+        .exec((err, user) => {
+            if (err) return res.sendStatus(500);
+            if (!user) return res.sendStatus(404);
+            lxc.list().then((infos) => {
+                let data = {
+                    section: 'ct',
+                    title: "CDWS",
+                    containers: infos,
+                    user: user
+                };
+                console.log(data);
+                return res.render('containers', {data: data});
+            }).catch((err) => {
+                return setErrorRes(res, err);
             });
         });
 });
