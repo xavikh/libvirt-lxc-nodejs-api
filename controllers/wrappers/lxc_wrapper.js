@@ -1,12 +1,12 @@
 'use strict';
 const promisify = require('util').promisify;
-
+const config = require('../../config');
 module.exports = function (configVar) {
 
     let obj = {};
+    configVar = configVar || {};
     const child = require('child'),
-        config = configVar || {},
-        sshBind = config.sshBind || false;
+        sshBind = configVar.sshBind || false;
 
     function textToArgs(s) {
         let words = [];
@@ -64,19 +64,22 @@ module.exports = function (configVar) {
      */
 
     obj.create = promisify(function (name, template, bdevOptions, next) {
-        if (!bdevOptions) {
-            sysExec('lxc-create -n ' + name +
-                ' -t ' + template,
-                next);
+        let bdev = '';
+        if (template.indexOf('-') > -1) {
+            let temp = template.split('-');
+            console.log("Arch: " + config.TEMPLATES_ARCH);
+            template = ' -t download -- -d ' + temp[0] + ' -r ' + temp[1] + ' -a ' + config.TEMPLATES_ARCH
         } else {
-            sysExec('lxc-create -n ' + name +
-                ' -t ' + template +
-                ' -B ' + bdevOptions.bdev +
+            template = ' -t ' + template;
+        }
+        if (bdevOptions) {
+            bdev += ' -B ' + bdevOptions.bdev +
                 ' --vgname ' + bdevOptions.vgname +
                 ' --lvname ' + bdevOptions.lvname +
-                ' --fssize ' + bdevOptions.fssize,
-                next);
+                ' --fssize ' + bdevOptions.fssize;
         }
+        console.log('lxc-create -n ' + name + bdev + template);
+        sysExec('lxc-create -n ' + name + bdev + template, next);
     });
 
     obj.destroy = promisify(function (name, next) {
