@@ -22,8 +22,6 @@ function updateLxcTemplates() {
                     buildDate: auxTemplate[4]
                 };
                 if (template.arch === config.TEMPLATES_ARCH) {
-                    template.dist = template.dist[0].toUpperCase() + template.dist.substring(1);
-                    template.release = template.release[0].toUpperCase() + template.release.substring(1);
                     templates.push(template);
                 }
             }

@@ -64,7 +64,9 @@ block content
                                     optgroup(label= group[0].dist)
                                         each temp in group
                                             -var tempId = temp.dist + '-' + temp.release
-                                            option(value= tempId) #{temp.dist} #{temp.release}
+                                            -var dist = temp.dist[0].toUpperCase() + temp.dist.substring(1);
+                                            -var release = temp.release[0].toUpperCase() + temp.release.substring(1);
+                                            option(value= tempId) #{dist} #{release}
                             label Template
         .modal-footer
             a.modalBtn.modal-action.waves-effect.waves-green.btn(href="#!" onclick="create_ct()") Create

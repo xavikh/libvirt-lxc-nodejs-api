@@ -476,3 +476,23 @@ function open_console(vm_name) {
     });
 }
 
+function create_ct() {
+    let name = $('#ctname').val();
+    let templateSelect = $('#templateSelect');
+    templateSelect.formSelect();
+    let template = templateSelect.formSelect('getSelectedValues')[0];
+
+    let data = {
+        template: template,
+        name: name
+    };
+    console.log(data);
+    M.toast({html: "Creating the container...", classes: "amber"});
+    request('POST', '/ct', getToken(), data, (response) => {
+        M.toast({html: response.message, classes: "green"});
+        setTimeout(() => {
+            location.reload()
+        }, 2000);
+    });
+}
+
