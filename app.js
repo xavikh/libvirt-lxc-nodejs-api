@@ -7,6 +7,7 @@ const sassMiddleware = require('node-sass-middleware');
 
 const websokify = require('./websockify');
 const network = require('./services/network');
+const templateUpdater = require('./services/lxcTemplateHelper');
 const codes = require("./services/codes");
 const index = require('./routes/index');
 const web = require('./routes/public_web');
@@ -19,13 +20,13 @@ const iso = require('./routes/images');
 codes.initTelegram();
 websokify.init_ws("", 3001, null, null);
 network.startContinousIpScan();
+templateUpdater.initCrontab();
 
 let app = express();
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
-//app.use(favicon(path.join(__dirname, 'public/images', 'favicon.ico')));
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));

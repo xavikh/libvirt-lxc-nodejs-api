@@ -6,6 +6,8 @@ const router = express.Router();
 const auth = require('../middlewares/auth');
 const midauth = require('../middlewares/midAuth');
 
+const lxc_templates = require('../services/lxcTemplateHelper');
+
 const setErrorRes = require('../controllers/wrappers/errorsLibvirt').setErrorRes;
 
 const domains_lvirt = require('../controllers/wrappers/libvirtDomains_wrapper');
@@ -134,6 +136,7 @@ router.get('/dashboard/ct', auth, (req, res) => {
                     section: 'ct',
                     title: "CDWS",
                     containers: infos,
+                    templates: lxc_templates.getTemplates(),
                     user: user
                 };
                 console.log(data);
