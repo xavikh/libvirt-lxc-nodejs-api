@@ -35,11 +35,11 @@ module.exports = function (configVar) {
             command: runCommand.slice(0, 1)[0],
             args: runCommand.slice(1),
             cbStdout: function (data) {
-                console.log('OutLog: ' + data);
+                //console.log('OutLog: ' + data);
                 output += data;
             },
             cbStderr: function (data) {
-                console.log('ErrLog' + data);
+                //console.log('ErrLog' + data);
                 output += data;
                 errors += data;
             },
@@ -47,12 +47,12 @@ module.exports = function (configVar) {
                 output += "exitcode: " + exitCode;
                 errors += "exitcode: " + exitCode;
                 if (exitCode !== 0) {
-                    return onClose({"exitCode": exitCode, "errors": errors}, undefined);
+                    return onClose({"exitCode": exitCode, "errors": errors}, output);
                 } else {
                     return onClose(null, output);
                 }
             }
-        }).start()
+        }).start();
     };
 
     /**
@@ -189,9 +189,9 @@ module.exports = function (configVar) {
                 output = output.split("\n");
                 for (let i in output) {
                     let content = output[i].trim();
-                    if (content.indexOf('RUNNING') >= 0 ||
-                        content.indexOf('FROZEN') >= 0 ||
-                        content.indexOf('STOPPED') >= 0) {
+                    if (content.indexOf('RUNNING') > -1 ||
+                        content.indexOf('FROZEN') > -1 ||
+                        content.indexOf('STOPPED') > -1) {
                         let vals = content.split(/\s+/gi);
                         if (vals.length >= 2) {
                             containers.push({

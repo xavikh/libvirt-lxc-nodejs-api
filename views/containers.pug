@@ -1,9 +1,15 @@
 extends layout
 
-mixin ct(name, ram, swap, status)
-    td.name(onclick="location.href = '/dashboard/ct/" + name + "';") #{name}
-    td.ram(onclick="location.href = '/dashboard/ct/" + name + "';") #{ram}
-    td.storage(onclick="location.href = '/dashboard/ct/" + name + "';") #{swap}
+mixin ct(name, ipv4, ram, swap, status)
+    td.name #{name}
+    td.name #{ipv4}
+    td.ram #{ram}
+    td.storage #{swap}
+    td.switch
+        label Off
+            input(type="checkbox")
+            span.lever
+        | On
     td.status(onclick="location.href = '/dashboard/ct/" + name + "';")
         case status
             when "RUNNING"
@@ -31,25 +37,61 @@ mixin ct(name, ram, swap, status)
 
 block content
 
+    #modalCreateCt.modal
+        .modal-content
+            form.col.s12
+                h4 Create a new Container
+                .row
+                    .col.s12
+                        .input-field
+                            input#ctname.validate(type="text")
+                            label(for="ctname") Name
+
+                        .input-field.col.s12
+                            select#templateSelect
+                                option(value="" disabled selected) Select a template
+                                -var templates = []
+                                -var lastDist = ""
+                                each template in data.templates
+                                    if(lastDist !== template.dist)
+                                        -lastDist = template.dist
+                                        -templates.push([])
+                                        -templates[templates.length-1].push(template)
+                                    else
+                                        -templates[templates.length-1].push(template)
+
+                                each group in templates
+                                    optgroup(label= group[0].dist)
+                                        each temp in group
+                                            -var tempId = temp.dist + '-' + temp.release
+                                            option(value= tempId) #{temp.dist} #{temp.release}
+                            label Template
+        .modal-footer
+            a.modalBtn.modal-action.waves-effect.waves-green.btn(href="#!" onclick="create_ct()") Create
+            a.modal-action.modal-close.waves-effect.waves-red.btn.red(href="#!") Cancel
+
     include header-nav
 
     main
         .fixed-action-btn
-            a.btn-floating.btn-large.green.modal-trigger(href="#modalCreateVm")
+            a.btn-floating.btn-large.green.modal-trigger(href="#modalCreateCt")
                 i.large.material-icons add
             ul
-                li: a.btn-floating.yellow.darken-1.modal-trigger(href="#modalCreateVm"): i.material-icons content_copy
+                li: a.btn-floating.yellow.darken-1.modal-trigger(href="#modalCreateCt"): i.material-icons content_copy
 
-        //-include sidebar
+        include sidebar
 
+        h3 LXC
         -var emptyList = false
         .table-container
             table.centered.highlight
                 thead
                     tr
                         th Name
+                        th IP
                         th Ram
                         th Swap
+                        th Autostart
                         th Status
                         th Actions
                 tbody
@@ -57,7 +99,7 @@ block content
                         -emptyList = true
                     else
                         each ct in data.containers
-                            tr: +ct(ct.name, ct.ram / 1048576, ct.swap / 1048576, ct.state)
+                            tr: +ct(ct.name, ct.ipv4, ct.ram, ct.swap, ct.state)
 
         if emptyList
             p.center Empty list
