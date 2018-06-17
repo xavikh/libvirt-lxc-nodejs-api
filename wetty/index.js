@@ -90,7 +90,6 @@ let new_client = function (client, req) {
     };
     log('WebSocket connection');
 
-    console.log('TOKEN ' + JSON.stringify(findToken(queries.token)));
     const term = pty.spawn('lxc-attach', ['-n' + findToken(queries.token).ctName]);
 
     console.log((new Date()) + " PID=" + term.pid + " STARTED");
@@ -101,6 +100,7 @@ let new_client = function (client, req) {
 
     term.on('exit', function (code) {
         console.log((new Date()) + " PID=" + term.pid + " ENDED with CODE=" + code);
+        client.close();
     });
 
     client.on('message', function (data) {

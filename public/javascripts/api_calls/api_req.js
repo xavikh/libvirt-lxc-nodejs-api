@@ -497,7 +497,7 @@ function create_ct() {
 
 function change_ct_status(name, status) {
     M.toast({html: "Processing...", classes: "amber"});
-    request('POST', '/ct/' + name + '/' + status, getToken(), data, (response) => {
+    request('PUT', '/ct/' + name + '/' + status, getToken(), null, (response) => {
         M.toast({html: response.message, classes: "green"});
         setTimeout(() => {
             location.reload()
