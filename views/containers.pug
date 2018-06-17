@@ -22,15 +22,15 @@ mixin ct(name, ipv4, ram, swap, status)
                 a.btn-flat.orange.non-clickable #{status}
 
     td.action
-        a.waves-effect.waves-light.btn-small.light-blue(onclick="change_vm_status('" + name + "', 'start')")
+        a.waves-effect.waves-light.btn-small.light-blue(onclick="change_ct_status('" + name + "', 'start')")
             i.material-icons play_arrow
-        a.waves-effect.waves-light.btn-small.amber(onclick="change_vm_status('" + name + "', 'reboot')")
+        a.waves-effect.waves-light.btn-small.amber(onclick="change_ct_status('" + name + "', 'restart')")
             i.material-icons replay
-        a.waves-effect.waves-light.btn-small.orange(onclick="change_vm_status('" + name + "', 'shutdown')")
+        a.waves-effect.waves-light.btn-small.orange(onclick="change_ct_status('" + name + "', 'stop')")
             i.material-icons stop
-        a.waves-effect.waves-light.btn-small.red(onclick="change_vm_status('" + name + "', 'force-shutdown')")
-            i.material-icons power
-        a.waves-effect.waves-light.btn-small.pink.darken-1(onclick="open_console('" + name + "')")
+        //a.waves-effect.waves-light.btn-small.red(onclick="change_ct_status('" + name + "', 'force-shutdown')")
+        //    i.material-icons power
+        a.waves-effect.waves-light.btn-small.pink.darken-1(onclick="open_console_ct('" + name + "')")
             i.material-icons airplay <!--open_in_browser personal_video open_in_new picture_in_picture??-->
         a.waves-effect.waves-light.btn-small.grey.darken-4(onclick="open_delete_modal('" + name + "')")
             i.material-icons delete

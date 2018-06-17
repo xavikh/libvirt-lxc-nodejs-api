@@ -15,6 +15,7 @@ router.get('/:name', ctCtrl.getInfo);
 router.put('/:name', ctCtrl.edit);
 router.delete('/:name', ctCtrl.remove);
 router.put('/:name/exec', ctCtrl.exec);
+router.get('/:name/console', ctCtrl.getConsoleSession);
 router.put('/:name/:status', ctCtrl.changeStatus);
 
 module.exports = router;

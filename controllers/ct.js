@@ -1,6 +1,7 @@
 'use strict';
-
+const crypto = require('crypto');
 const lxc = require('./wrappers/lxc_wrapper')();
+const wetty = require('../wetty');
 
 function create(req, res) {
     const name = req.body.name;
@@ -39,8 +40,11 @@ function edit(req, res) {
 }
 
 function changeStatus(req, res) {
-    const name = req.body.name;
-    const status = req.body.status;
+    const name = req.params.name;
+    const status = req.params.status;
+
+    console.log(name);
+    console.log(status);
 
     switch (status) {
         case "start":
@@ -118,6 +122,14 @@ function remove(req, res) {
     })
 }
 
+function getConsoleSession(req, res) {
+    let ct_name = req.params.name;
+    console.log('ct_name: ' + ct_name);
+    let token = crypto.randomBytes(10).toString('hex');
+    wetty.addTokenVar(token, ct_name);
+    res.status(200).send({token: token});
+}
+
 module.exports = {
     create,
     list,
@@ -125,5 +137,6 @@ module.exports = {
     edit,
     changeStatus,
     exec,
-    remove
+    remove,
+    getConsoleSession
 };

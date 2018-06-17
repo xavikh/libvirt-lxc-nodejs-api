@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const sassMiddleware = require('node-sass-middleware');
 
 const websokify = require('./websockify');
+const wetty = require('./wetty');
 const network = require('./services/network');
 const templateUpdater = require('./services/lxcTemplateHelper');
 const codes = require("./services/codes");
@@ -19,6 +20,7 @@ const iso = require('./routes/images');
 
 codes.initTelegram();
 websokify.init_ws("", 3001, null, null);
+wetty.init_ws("", 3002);
 network.startContinousIpScan();
 templateUpdater.initCrontab();
 

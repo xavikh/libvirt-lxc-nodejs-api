@@ -486,7 +486,6 @@ function create_ct() {
         template: template,
         name: name
     };
-    console.log(data);
     M.toast({html: "Creating the container...", classes: "amber"});
     request('POST', '/ct', getToken(), data, (response) => {
         M.toast({html: response.message, classes: "green"});
@@ -496,3 +495,20 @@ function create_ct() {
     });
 }
 
+function change_ct_status(name, status) {
+    M.toast({html: "Processing...", classes: "amber"});
+    request('POST', '/ct/' + name + '/' + status, getToken(), data, (response) => {
+        M.toast({html: response.message, classes: "green"});
+        setTimeout(() => {
+            location.reload()
+        }, 2000);
+    });
+}
+
+function open_console_ct(ct_name) {
+    request('GET', '/ct/' + ct_name + '/console', getToken(), null, (response) => {
+        let strWindowFeatures = "location=no,height=768,width=1020,left=10,top=10,scrollbars=yes,status=no,menubar=no,titlebar=no,toolbar=no";
+        let URL = "/wetty_console?token=" + response.token;
+        let win = window.open(URL, "_blank", strWindowFeatures);
+    });
+}

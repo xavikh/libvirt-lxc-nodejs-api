@@ -148,8 +148,7 @@ router.get('/dashboard/ct', auth, (req, res) => {
 });
 
 router.get('/console', auth, (req, res) => {
-    let data = {
-    };
+    let data = {};
     return res.render('console', {data: data});
 });
 
