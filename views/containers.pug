@@ -32,7 +32,7 @@ mixin ct(name, ipv4, ram, swap, status)
         //    i.material-icons power
         a.waves-effect.waves-light.btn-small.pink.darken-1(onclick="open_console_ct('" + name + "')")
             i.material-icons airplay <!--open_in_browser personal_video open_in_new picture_in_picture??-->
-        a.waves-effect.waves-light.btn-small.grey.darken-4(onclick="open_delete_modal('" + name + "')")
+        a.waves-effect.waves-light.btn-small.grey.darken-4(onclick="open_delete_ct_modal('" + name + "')")
             i.material-icons delete
 
 block content
@@ -70,6 +70,14 @@ block content
                             label Template
         .modal-footer
             a.modalBtn.modal-action.waves-effect.waves-green.btn(href="#!" onclick="create_ct()") Create
+            a.modal-action.modal-close.waves-effect.waves-red.btn.red(href="#!") Cancel
+
+    #modalDeleteCt.modal
+        .modal-content
+            form.col.s12
+                h4 Delete the Container
+        .modal-footer
+            a.modalBtn.modal-action.modal-close.waves-effect.waves-green.btn(href="#!" onclick="delete_ct()") Delete
             a.modal-action.modal-close.waves-effect.waves-red.btn.red(href="#!") Cancel
 
     include header-nav

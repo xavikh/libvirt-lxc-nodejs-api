@@ -139,7 +139,6 @@ router.get('/dashboard/ct', auth, (req, res) => {
                     templates: lxc_templates.getTemplates(),
                     user: user
                 };
-                console.log(data);
                 return res.render('containers', {data: data});
             }).catch((err) => {
                 return setErrorRes(res, err);

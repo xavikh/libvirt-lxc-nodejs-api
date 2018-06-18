@@ -512,3 +512,19 @@ function open_console_ct(ct_name) {
         let win = window.open(URL, "_blank", strWindowFeatures);
     });
 }
+
+function open_delete_ct_modal(name) {
+    console.log("pp")
+    $('#modalDeleteCt').data('ctname', name).modal('open');
+}
+
+function delete_ct(ct_name) {
+    let name = $('#modalDeleteCt').data('ctname');
+    M.toast({html: "Deleting " + name + "...", classes: "amber"});
+    request('DELETE', '/ct/' + name, getToken(), null, (response) => {
+        M.toast({html: name + " deleted", classes: "green"});
+        setTimeout(() => {
+            location.reload()
+        }, 1000);
+    });
+}

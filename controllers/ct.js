@@ -65,7 +65,7 @@ function changeStatus(req, res) {
             lxc.isRunning(name).then((isRunning) => {
                 if (isRunning) {
                     lxc.stop(name).then(() => {
-                        res.status(200).send("Container stopped");
+                        res.status(200).send({message: "Container stopped"});
                     }).catch((err) => {
                         console.log(err);
                         res.status(500).send({message: "Some error occurred"});

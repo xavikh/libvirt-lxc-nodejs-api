@@ -91,7 +91,7 @@ module.exports = function (configVar) {
     });
 
     obj.stop = promisify(function (name, next) {
-        sysExec('lxc-stop -n ' + name, next);
+        sysExec('lxc-stop -n ' + name + ' -t 15', next);
     });
 
     obj.freeze = promisify(function (name, next) {
