@@ -3,8 +3,7 @@ extends layout
 mixin ct(name, ipv4, ram, swap, status)
     td.name #{name}
     td.name #{ipv4}
-    td.ram #{ram}
-    td.storage #{swap}
+    td.storage #{ram}
     td.switch
         label Off
             input(type="checkbox")
@@ -100,7 +99,6 @@ block content
                         th Name
                         th IP
                         th Ram
-                        th Swap
                         th Autostart
                         th Status
                         th Actions

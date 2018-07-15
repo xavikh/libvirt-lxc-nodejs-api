@@ -507,9 +507,13 @@ function change_ct_status(name, status) {
 
 function open_console_ct(ct_name) {
     request('GET', '/ct/' + ct_name + '/console', getToken(), null, (response) => {
-        let strWindowFeatures = "location=no,height=768,width=1020,left=10,top=10,scrollbars=yes,status=no,menubar=no,titlebar=no,toolbar=no";
-        let URL = "/wetty_console?token=" + response.token;
-        let win = window.open(URL, "_blank", strWindowFeatures);
+        if (response.token !== null) {
+            let strWindowFeatures = "location=no,height=768,width=1020,left=10,top=10,scrollbars=yes,status=no,menubar=no,titlebar=no,toolbar=no";
+            let URL = "/wetty_console?token=" + response.token;
+            let win = window.open(URL, "_blank", strWindowFeatures);
+        } else {
+            M.toast({html: response.message, classes: "red"});
+        }
     });
 }
 
