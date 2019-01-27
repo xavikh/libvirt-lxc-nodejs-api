@@ -5,19 +5,26 @@ let fs = Promise.promisifyAll(require('fs'));
 const request = require('request');
 const progress = require('request-progress');
 
+const isoFolder = require('../../config').ISO_FOLDER;
+
 let downloadState = {};
 let downloadRequests = {};
 
-function isoList(next) {
-    const testFolder = '/isos/';
+function checkFolder(path) {
+    if (!fs.existsSync(path)) {
+        fs.mkdirSync(path);
+    }
+}
 
-    fs.readdir(testFolder, (err, files) => {
+function isoList(next) {
+    checkFolder(isoFolder);
+    fs.readdir(isoFolder, (err, files) => {
         if (err) return next(err);
 
         let filesPromises = files.map((file) => {
-            return fs.statAsync(testFolder + file).then((stat) => {
+            return fs.statAsync(isoFolder + file).then((stat) => {
                 return {
-                    path: testFolder + file,
+                    path: isoFolder + file,
                     filename: file,
                     size: stat.size,
                     creation: stat.birthtime
@@ -34,9 +41,10 @@ function isoList(next) {
 }
 
 function downloadIso(url, next) {
+    checkFolder(isoFolder);
     let filename = url.split('/');
     filename = filename[filename.length - 1];
-    let path = '/isos/' + filename;
+    let path = isoFolder + filename;
 
     if (!downloadRequests[filename]) {
         downloadRequests[filename] = request(url);
@@ -74,7 +82,8 @@ function stopDownload(filename, next) {
 }
 
 function removeIso(iso, next) {
-    let path = "/isos/" + iso;
+    checkFolder(isoFolder);
+    let path = isoFolder + iso;
 
     fs.unlink(path, (err) => {
         if (err) return next(err);
