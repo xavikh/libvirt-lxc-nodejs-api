@@ -1,4 +1,4 @@
-const host = "http://192.168.0.10:3000";
+const host = "http://192.168.0.12:3000"; //TODO: use server hostname
 
 function request(method, path, auth, data, next) {
     let req_params = {

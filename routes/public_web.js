@@ -9,6 +9,7 @@ const midauth = require('../middlewares/midAuth');
 const lxc_templates = require('../services/lxcTemplateHelper');
 
 const setErrorRes = require('../controllers/wrappers/errorsLibvirt').setErrorRes;
+const setError = require('../controllers/wrappers/errorsLibvirt').setError;
 
 const domains_lvirt = require('../controllers/wrappers/libvirtDomains_wrapper');
 const volumes_lvirt = require('../controllers/wrappers/libvirtVolumes_wrapper');
@@ -113,7 +114,8 @@ router.get('/dashboard/images', auth, (req, res) => {
             if (err) return res.sendStatus(500);
             if (!user) return res.sendStatus(404);
             images.isoList((err, isos) => {
-                if (err) return setErrorRes(res, err);
+                console.log(err);
+                if (err) return setErrorRes(res, setError(500, "A error occurred retrieving the images"));
                 let data = {
                     section: 'images',
                     title: "CDWS",

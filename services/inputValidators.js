@@ -61,6 +61,24 @@ function validStatus(status) {
     return valid
 }
 
+function validMachineName(name) {
+    if (!name || name.length === 0) return false;
+    let namePattern = /[a-z0-9]{2,25}/i; //TODO: Use constants
+    return namePattern.test(name)
+}
+
+function validVcpus(vcpu) {
+    if (!vcpu || vcpu.length === 0) return false;
+    let vcpuPattern = /[1-4]/i; //TODO: Use constants
+    return vcpuPattern.test(vcpu);
+}
+
+function validMemory(memory) {
+    if (!memory || memory.length === 0) return false;
+    let memoryPattern = /[1-16]/i; //TODO: What values are accepted as memory? //TODO: Use constants
+    return memoryPattern.test(memory);
+}
+
 module.exports = {
     validEmail,
     validPassword,

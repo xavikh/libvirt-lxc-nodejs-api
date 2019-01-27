@@ -1,6 +1,7 @@
 const HP = require('../../lib/index').Hypervisor;
 const parseError = require('./errorsLibvirt').parseError;
 
+// const hp = new HP('qemu+ssh://admin@192.168.0.10/system');
 const hp = new HP('qemu:///system');
 
 function connect(next) {

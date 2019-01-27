@@ -18,7 +18,7 @@ function randomMAC(prefix) {
 }
 
 function ipMacAnalysis() {
-    console.log("Analysing IPs...");
+    console.log("Updating IP list...");
     exec("nmap -sP --send-ip 192.168.0.0/24", () => {
         exec("/sbin/ip n | grep REACHABLE", (error, stdout, stderr) => {
             if (error) {
@@ -42,7 +42,6 @@ function ipMacAnalysis() {
                 mac_ip_list = mac_ip.sort((a, b) => {
                     return a.ip.split('.')[3] - b.ip.split('.')[3];
                 });
-                console.log(mac_ip_list);
                 console.log(mac_ip_list.length + " IPs found");
                 fs.writeFileSync('ip_mac_scanner_results.json', JSON.stringify(mac_ip_list));
             });
